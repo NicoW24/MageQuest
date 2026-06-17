@@ -41,3 +41,15 @@ TagManager:
   - name: Default
     uniqueID: 0
     locked: 0
+  - name: UI
+    uniqueID: 1857812815
+    locked: 0
+  - name: Background
+    uniqueID: 1432073825
+    locked: 0
+  - name: Character
+    uniqueID: 3437124797
+    locked: 0
+  - name: Mist
+    uniqueID: 2835508771
+    locked: 0
