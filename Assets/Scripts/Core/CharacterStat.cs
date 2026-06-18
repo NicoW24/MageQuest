@@ -17,15 +17,26 @@ namespace Core.Game
         [SerializeField] float _currentAttack;
         [SerializeField] float _currentMana;
         [SerializeField] float _currentSpeed;
-        
-        public void SetupCharacter(CharacterDetailSO characterDetail)
+
+        void Start()
         {
-            characterDetailSO = characterDetail;
-            _currentHP = characterDetail.HP;
-            _currentDef = characterDetail.Def;
-            _currentAttack = characterDetail.Attack;
-            _currentMana = characterDetail.Mana;
-            _currentSpeed = characterDetail.Speed;
+            //check SO
+            if(characterDetailSO == null)
+            {
+                Debug.LogError("FORGOT TO ADD CHARACTER DETAIL DATA");
+            }
+        }
+
+        /// <summary>
+        /// Setup initial stat
+        /// </summary>
+        public void SetupCharacter()
+        {
+            _currentHP = characterDetailSO.HP;
+            _currentDef = characterDetailSO.Def;
+            _currentAttack = characterDetailSO.Attack;
+            _currentMana = characterDetailSO.Mana;
+            _currentSpeed = characterDetailSO.Speed;
         }
     }
 }

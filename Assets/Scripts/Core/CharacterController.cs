@@ -1,4 +1,3 @@
-using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
@@ -6,52 +5,70 @@ namespace Core.Game
 {
     public class CharacterController : MonoBehaviour
     {
-        [SerializeField] Animator _characterAnimator;
-        [SerializeField] float _moveSpeed;
-        int _dir = 1;
+        [SerializeField] SPUM_Prefabs _characterSPUM;
+        CharacterStat _characterStat;
 
-        void Start()
+        protected bool _canMove;
+
+        public Dictionary<PlayerState, int> IndexPair = new();
+        public virtual void Start()
         {
-            _characterAnimator = GetComponent<Animator>();
+            //init character stat
+            _characterStat = GetComponent<CharacterStat>();
+            _characterStat.SetupCharacter();
+
+            //init SPUM plugin
+            if (_characterSPUM == null)
+            {
+                _characterSPUM = transform.GetChild(0).GetComponent<SPUM_Prefabs>();
+                if (!_characterSPUM.allListsHaveItemsExist())
+                {
+                    _characterSPUM.PopulateAnimationLists();
+                }
+                _characterSPUM.OverrideControllerInit();
+            }
+
+            _canMove = true;
+            //add event battle started
+            BattleManager.Instance.OnBattleStarted += BattleStarted;
+            BattleManager.Instance.OnBattleEnded += BattleStarted;
         }
 
-        void Update()
+        /// <summary>
+        /// Function to play animation through SPUM
+        /// </summary>
+        public void PlayStateAnimation(PlayerState state, int indexAnimation=0)
         {
-            Move();
+            _characterSPUM.PlayAnimation(state, indexAnimation);
         }
 
-        void Move()
+        void OnDisable()
         {
-            Vector3 dir = Vector3.zero;
-            bool moving = false;
-            _characterAnimator.SetBool("isRun", false);
+            //remove event on disable
+            BattleManager.Instance.OnBattleStarted -= BattleStarted;
+            BattleManager.Instance.OnBattleEnded -= BattleStarted;
+        }
 
-            //check direction
-            if (Input.GetAxisRaw("Horizontal") < 0)
-            {
-                _dir = -1;
-                dir = Vector3.left;
+        /// <summary>
+        /// Character move function
+        /// </summary>
+        public virtual void Move() { }
+        /// <summary>
+        /// Character attack function
+        /// </summary>
+        public virtual void Attack() { }
 
-                transform.localScale = new Vector3(_dir, 1, 1);
-                moving = true;
-            }
-            if (Input.GetAxisRaw("Horizontal") > 0)
-            {
-                _dir = 1;
-                dir = Vector3.right;
-
-                transform.localScale = new Vector3(_dir, 1, 1);
-                moving= true;
-            }
-
-            //set animation
-            if (moving)
-            {
-                _characterAnimator.SetBool("isRun", true);
-            }
-
-            //move the character object
-            transform.position += dir * _moveSpeed * Time.deltaTime;
+        public void BattleStarted()
+        {
+            //set idle
+            PlayStateAnimation(PlayerState.IDLE);
+            _canMove = false;
+        }
+        public void BattleEnded()
+        {
+            //set idle
+            PlayStateAnimation(PlayerState.IDLE);
+            _canMove = true;
         }
     }
 }

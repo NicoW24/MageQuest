@@ -1,3 +1,16 @@
 {
-	"name": "Core.Game"
+    "name": "Core.Game",
+    "rootNamespace": "",
+    "references": [
+        "GUID:69f23387424476a47b24b977350e861b"
+    ],
+    "includePlatforms": [],
+    "excludePlatforms": [],
+    "allowUnsafeCode": false,
+    "overrideReferences": false,
+    "precompiledReferences": [],
+    "autoReferenced": true,
+    "defineConstraints": [],
+    "versionDefines": [],
+    "noEngineReferences": false
 }

@@ -1,0 +1,132 @@
+using System.Collections;
+using System.Collections.Generic;
+using UnityEngine;
+
+namespace Core.Game
+{
+    public class EnemyCharacterController : CharacterController
+    {
+        [SerializeField] float patrolDistance = 3f;
+        public float patrolWaitTime = 1.5f;
+        bool _waiting;
+        float _waitTimer;
+
+        [SerializeField] float _moveSpeed = 5;
+
+        [Header("Detection")]
+        [SerializeField] Transform _player;
+        [SerializeField] float _detectionRadius = 5f;
+
+        [Header("Battle")]
+        public float _stoppingDistance = 1.2f;
+        CharacterStat _thisCharacterStat;
+
+        private Vector2 _APos;
+        private Vector2 _BPos;
+        private Vector2 _targetPos;
+
+        public override void Start()
+        {
+            base.Start();
+
+            _thisCharacterStat = GetComponent<CharacterStat>();
+
+            //setup patrol position
+            _APos = transform.position + Vector3.left * patrolDistance;
+            _BPos = transform.position + Vector3.right * patrolDistance;
+
+            _targetPos = _BPos;
+            _player = BattleManager.Instance.GetPlayerObject();
+        }
+
+        void Update()
+        {
+            if (!_canMove)
+            {
+                return;
+            }
+
+            float distanceToPlayer = Vector2.Distance(transform.position, _player.position);
+            if (distanceToPlayer <= _detectionRadius)
+            {
+                Chase();
+            }
+            else
+            {
+                Patrol();
+            }
+        }
+        void Patrol()
+        {
+            if (_waiting)
+            {
+                //set idle
+                PlayStateAnimation(PlayerState.IDLE);
+
+                _waitTimer -= Time.deltaTime;
+                if (_waitTimer <= 0f)
+                    _waiting = false;
+                return;
+            }
+
+            MoveTowards(_targetPos, _moveSpeed);
+
+            if (Vector2.Distance(transform.position, _targetPos) < 0.1f)
+            {
+                _waiting = true;
+                _waitTimer = patrolWaitTime;
+
+                _targetPos = (_targetPos == _APos) ? _BPos : _APos;
+            }
+        }
+
+        void Chase()
+        {
+            float distanceToPlayer = Vector2.Distance(transform.position, _player.position);
+
+            if (distanceToPlayer > _stoppingDistance)
+            {
+                MoveTowards(_player.position, _moveSpeed * 1.5f);
+            }
+            else if (distanceToPlayer < _stoppingDistance)
+            {
+                //attack
+                Attack();
+                _canMove = false;
+            }
+
+            _waiting = false;
+        }
+
+        void MoveTowards(Vector2 destination, float moveSpeed)
+        {
+            Vector2 dir = (destination - (Vector2)transform.position).normalized;
+
+            //move enemy
+            transform.position = Vector2.MoveTowards(
+                transform.position,
+                destination,
+                moveSpeed * Time.deltaTime
+            );
+
+            //set move
+            PlayStateAnimation(PlayerState.MOVE);
+
+            //flip sprite
+            if (dir.x > 0.01f)
+                transform.localScale = new Vector3(-1, 1, 1);
+            else if (dir.x < -0.01f)
+                transform.localScale = new Vector3(1, 1, 1);
+        }
+
+        public override void Attack()
+        {
+            //set attack
+            PlayStateAnimation(PlayerState.ATTACK, 0);
+
+            //enemy start battle
+            BattleManager.Instance.StartBattle(_thisCharacterStat, true);
+        }
+    }
+}
+
