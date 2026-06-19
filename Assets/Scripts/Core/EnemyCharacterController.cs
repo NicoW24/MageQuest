@@ -56,6 +56,10 @@ namespace Core.Game
                 Patrol();
             }
         }
+
+        /// <summary>
+        /// AI patrol function
+        /// </summary>
         void Patrol()
         {
             if (_waiting)
@@ -79,7 +83,9 @@ namespace Core.Game
                 _targetPos = (_targetPos == _APos) ? _BPos : _APos;
             }
         }
-
+        /// <summary>
+        /// AI chase function
+        /// </summary>
         void Chase()
         {
             float distanceToPlayer = Vector2.Distance(transform.position, _player.position);
@@ -98,31 +104,14 @@ namespace Core.Game
             _waiting = false;
         }
 
-        void MoveTowards(Vector2 destination, float moveSpeed)
+        public override void MoveTowards(Vector2 destination, float moveSpeed)
         {
-            Vector2 dir = (destination - (Vector2)transform.position).normalized;
-
-            //move enemy
-            transform.position = Vector2.MoveTowards(
-                transform.position,
-                destination,
-                moveSpeed * Time.deltaTime
-            );
-
-            //set move
-            PlayStateAnimation(PlayerState.MOVE);
-
-            //flip sprite
-            if (dir.x > 0.01f)
-                transform.localScale = new Vector3(-1, 1, 1);
-            else if (dir.x < -0.01f)
-                transform.localScale = new Vector3(1, 1, 1);
+            base.MoveTowards(destination, moveSpeed);
         }
 
-        public override void Attack()
+        protected override void Attack()
         {
-            //set attack
-            PlayStateAnimation(PlayerState.ATTACK, 0);
+            base.Attack();
 
             //enemy start battle
             BattleManager.Instance.StartBattle(_thisCharacterStat, true);

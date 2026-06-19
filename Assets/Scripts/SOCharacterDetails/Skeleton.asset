@@ -16,6 +16,6 @@ MonoBehaviour:
   characterElement: 2
   HP: 30
   Def: 0
-  Attack: 5
+  Attack: 30
   Mana: 0
   Speed: 0

@@ -11,6 +11,7 @@ namespace Core.Game
         protected bool _canMove;
 
         public Dictionary<PlayerState, int> IndexPair = new();
+
         public virtual void Start()
         {
             //init character stat
@@ -35,13 +36,8 @@ namespace Core.Game
         }
 
         /// <summary>
-        /// Function to play animation through SPUM
+        /// Remove event on disable
         /// </summary>
-        public void PlayStateAnimation(PlayerState state, int indexAnimation=0)
-        {
-            _characterSPUM.PlayAnimation(state, indexAnimation);
-        }
-
         void OnDisable()
         {
             //remove event on disable
@@ -50,13 +46,45 @@ namespace Core.Game
         }
 
         /// <summary>
+        /// Function to play animation through SPUM
+        /// </summary>
+        public void PlayStateAnimation(PlayerState state, int indexAnimation = 0)
+        {
+            _characterSPUM.PlayAnimation(state, indexAnimation);
+        }
+
+        /// <summary>
         /// Character move function
         /// </summary>
-        public virtual void Move() { }
+        public virtual void MoveTowards(Vector2 destination, float moveSpeed)
+        {
+            Vector2 dir = (destination - (Vector2)transform.position).normalized;
+
+            //move character
+            transform.position = Vector2.MoveTowards(
+                transform.position,
+                destination,
+                moveSpeed * Time.deltaTime
+            );
+
+            //set move
+            PlayStateAnimation(PlayerState.MOVE);
+
+            //flip sprite
+            if (dir.x > 0.01f)
+                transform.localScale = new Vector3(-1, 1, 1);
+            else if (dir.x < -0.01f)
+                transform.localScale = new Vector3(1, 1, 1);
+        }
         /// <summary>
         /// Character attack function
         /// </summary>
-        public virtual void Attack() { }
+        protected virtual void Attack()
+        {
+            //set attack
+            PlayStateAnimation(PlayerState.ATTACK, 0);
+            PlayStateAnimation(PlayerState.IDLE);
+        }
 
         public void BattleStarted()
         {

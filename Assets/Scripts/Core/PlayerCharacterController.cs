@@ -23,13 +23,13 @@ namespace Core.Game
             {
                 Attack();
             }
-            Move();
+            PlayerMove();
         }
 
         /// <summary>
         /// Player move function
         /// </summary>
-        public override void Move()
+        void PlayerMove()
         {
             Vector3 dir = Vector3.zero;
             bool moving = false;
@@ -66,11 +66,9 @@ namespace Core.Game
         /// <summary>
         /// Player attack function
         /// </summary>
-        public override void Attack()
+        protected override void Attack()
         {
-            //set attack
-            PlayStateAnimation(PlayerState.ATTACK,0);
-            PlayStateAnimation(PlayerState.IDLE);
+            base.Attack();
             //get enemy character stat
             CharacterStat enemy = _weaponObject.GetCurrentEnemy();
             //if enemy detected start battle from player
