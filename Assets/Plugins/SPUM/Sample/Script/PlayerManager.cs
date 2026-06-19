@@ -3,9 +3,6 @@ using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
 using UnityEngine.EventSystems;
-#if UNITY_6000_0_OR_NEWER
-using UnityEngine.InputSystem;
-#endif
 using UnityEngine.UI;
 
 public class PlayerManager : MonoBehaviour
@@ -38,9 +35,6 @@ public class PlayerManager : MonoBehaviour
 
     void Start()
     {
-        #if UNITY_6000_0_OR_NEWER
-        CheckInputSystemUIModule();
-        #endif
         if(_savedUnitList.Count.Equals(0) || _playerList.Count.Equals(0))
             GetPlayerList();
     }
@@ -48,16 +42,9 @@ public class PlayerManager : MonoBehaviour
     void Update()
     {
         if(EventSystem.current.IsPointerOverGameObject()) return;
-        #if UNITY_6000_0_OR_NEWER
-        if(Mouse.current != null && Mouse.current.leftButton.wasPressedThisFrame)
-        {
-            RaycastHit2D hit = Physics2D.Raycast(Camera.main.ScreenToWorldPoint(Mouse.current.position.ReadValue()), Vector2.zero);
-        #else
         if(Input.GetMouseButtonDown(0))
         {
             RaycastHit2D hit = Physics2D.Raycast(Camera.main.ScreenToWorldPoint(Input.mousePosition), Vector2.zero);
-        #endif
-            
             if(hit.collider != null)
             {
                 bool isHitPlayer = hit.collider.CompareTag("Player");

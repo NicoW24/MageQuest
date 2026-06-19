@@ -17,8 +17,8 @@ namespace Core.Game
 {
     public class BattleManager : MonoBehaviour
     {
-        [SerializeField] int _currentTurn;
         [SerializeField] BattleState _currentBattleState;
+        bool _playerCanDoAction = true;//prevent player spamming action
         [SerializeField] List<CharacterStat> _currentCharactersInBattle=new List<CharacterStat>();
 
         [SerializeField] CharacterStat _playerCharacter;
@@ -65,7 +65,6 @@ namespace Core.Game
         public void StartBattle(CharacterStat _enemyCharacter,bool enemyInitiate = false)
         {
             _currentCharactersInBattle.Clear();
-            _currentTurn = 0;
             _currentEnemy = _enemyCharacter;
 
             //invoke event to stop characters from moving
@@ -113,20 +112,22 @@ namespace Core.Game
             //if enemy first turn then enemy start attack
             if(_currentBattleState == BattleState.EnemyTurn)
             {
+                _playerCanDoAction = false;
                 StartCoroutine(EnemyAttack());
             }
         }
 
         #region Battle System
+        #region Player Turn
         public void OnPlayerAttack()
         {
-            if(_currentBattleState != BattleState.PlayerTurn)
+            if(_currentBattleState != BattleState.PlayerTurn || !_playerCanDoAction)
                 return;
             StartCoroutine(PlayerAttack());
         }
-
         IEnumerator PlayerAttack()
         {
+            _playerCanDoAction = false;
             float damage = _playerCharacter.GetCurrentAttack();
             //player attack animation (NOT DONE)
             //enemy take damage animation (NOT DONE)
@@ -146,7 +147,8 @@ namespace Core.Game
             BattleGUIManager.Instance.UpdateTurnUI();
             StartCoroutine(EnemyAttack());
         }
-
+        #endregion
+        #region Enemy Turn
         IEnumerator EnemyAttack()
         {
             yield return new WaitForSeconds(1f);
@@ -165,7 +167,9 @@ namespace Core.Game
             //change turn
             ChangeBattleState(BattleState.PlayerTurn);
             BattleGUIManager.Instance.UpdateTurnUI();
+            _playerCanDoAction = true;
         }
+        #endregion
         #endregion
     }
 }

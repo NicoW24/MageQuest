@@ -36,20 +36,22 @@ namespace Core.Game
             PlayStateAnimation(PlayerState.IDLE);
 
             //check direction
-            if (Input.GetAxisRaw("Horizontal") < 0)
-            {
-                _dir = -1;
-                dir = Vector3.left;
-
-                transform.localScale = new Vector3(_dir, 1, 1);
-                moving = true;
-            }
             if (Input.GetAxisRaw("Horizontal") > 0)
             {
-                _dir = 1;
+                //right is -1 since sprite is originally looking left
+                _dir = -1;
                 dir = Vector3.right;
 
-                transform.localScale = new Vector3(_dir, 1, 1);
+                _characterSPUM.transform.localScale = new Vector3(_dir, 1, 1);
+                moving = true;
+            }
+            if (Input.GetAxisRaw("Horizontal") < 0)
+            {
+                //left is 1 since sprite is originally looking left
+                _dir = 1;
+                dir = Vector3.left;
+
+                _characterSPUM.transform.localScale = new Vector3(_dir, 1, 1);
                 moving = true;
             }
 

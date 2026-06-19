@@ -5,10 +5,11 @@ namespace Core.Game
 {
     public class CharacterController : MonoBehaviour
     {
-        [SerializeField] SPUM_Prefabs _characterSPUM;
+        protected SPUM_Prefabs _characterSPUM;
         CharacterStat _characterStat;
 
         protected bool _canMove;
+        float _initialSpriteDir;//char sprite direction 
 
         public Dictionary<PlayerState, int> IndexPair = new();
 
@@ -28,7 +29,7 @@ namespace Core.Game
                 }
                 _characterSPUM.OverrideControllerInit();
             }
-
+            _initialSpriteDir = _characterSPUM.transform.localScale.x;
             _canMove = true;
             //add event battle started
             BattleManager.Instance.OnBattleStarted += BattleStarted;
@@ -54,7 +55,7 @@ namespace Core.Game
         }
 
         /// <summary>
-        /// Character move function
+        /// Character automatic move function
         /// </summary>
         public virtual void MoveTowards(Vector2 destination, float moveSpeed)
         {
@@ -72,9 +73,11 @@ namespace Core.Game
 
             //flip sprite
             if (dir.x > 0.01f)
-                transform.localScale = new Vector3(-1, 1, 1);
+                //right is -1 since sprite is originally looking left
+                _characterSPUM.transform.localScale = new Vector3(-_initialSpriteDir, 1, 1);
             else if (dir.x < -0.01f)
-                transform.localScale = new Vector3(1, 1, 1);
+                //left is 1 since sprite is originally looking left
+                _characterSPUM.transform.localScale = new Vector3(_initialSpriteDir, 1, 1);
         }
         /// <summary>
         /// Character attack function
