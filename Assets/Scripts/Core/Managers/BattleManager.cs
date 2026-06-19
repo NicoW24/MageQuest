@@ -1,8 +1,10 @@
 using System.Collections;
 using System.Collections.Generic;
+using System.Security.Cryptography.X509Certificates;
 using UI.Game;
 using UnityEngine;
 using UnityEngine.Events;
+using static UnityEngine.GraphicsBuffer;
 
 public enum BattleState
 {
@@ -22,7 +24,11 @@ namespace Core.Game
         [SerializeField] List<CharacterStat> _currentCharactersInBattle=new List<CharacterStat>();
 
         [SerializeField] CharacterStat _playerCharacter;
+        CharacterController _playerCharController;
+        Vector3 _playerStartBattlePos;
         [SerializeField] CharacterStat _currentEnemy;
+        CharacterController _currentEnemyCharController;
+        Vector3 _EnemyStartBattlePos;
 
         public UnityAction OnBattleStarted;
         public UnityAction OnBattleEnded;
@@ -35,7 +41,13 @@ namespace Core.Game
             {
                 Instance = this;
             }
+        }
+
+        void Start()
+        {
             _currentBattleState = BattleState.NoBattle;
+            //set player controller var
+            _playerCharController = _playerCharacter.GetController();
         }
         /// <summary>
         /// Function to get player character object
@@ -66,6 +78,12 @@ namespace Core.Game
         {
             _currentCharactersInBattle.Clear();
             _currentEnemy = _enemyCharacter;
+            //set current enemy controller var
+            _currentEnemyCharController = _enemyCharacter.GetController();
+
+            //set battle start position foreach char
+            _EnemyStartBattlePos = _currentEnemyCharController.transform.position;
+            _playerStartBattlePos = _playerCharController.transform.position;
 
             //invoke event to stop characters from moving
             OnBattleStarted?.Invoke();
@@ -135,14 +153,37 @@ namespace Core.Game
         {
             _playerCanDoAction = false;
             float damage = _playerCharacter.GetCurrentAttack();
-            //player attack animation (NOT DONE)
-            //enemy take damage animation (NOT DONE)
 
+            //player attack animation
+            //wait for player reach enemy
+            while (Vector2.Distance(_playerCharacter.transform.position,_currentEnemy.transform.position) > 3f)
+            {
+                _playerCharController.MoveTowards(_currentEnemy.transform.position, 5f);
+                yield return null;
+            }
+            //set attack animation
+            _playerCharController.Attack();
+            while (!_playerCharController.AnimationDone())
+                yield return null;
+            //enemy take damage animation
+            _currentEnemyCharController.TakeDamage();
             _currentEnemy.TakeDamage(damage);
+            //add delay before player go back to start pos
+            yield return new WaitForSeconds(1.5f);
+            //wait for player reach starting pos
+            while (Vector2.Distance(_playerCharacter.transform.position, _playerStartBattlePos) > 0f)
+            {
+                _playerCharController.MoveTowards(_playerStartBattlePos, 5f);
+                yield return null;
+            }
+            //make player char idle and flip sprite to be starting pos
+            _playerCharController.Idle();
             //check win condition
             if (_currentEnemy.GetCurrentHP() <= 0)
             {
                 ChangeBattleState(BattleState.Win);
+                _currentEnemyCharController.Death();
+                //add screen, destroy enemy (NOT DONE)
                 Debug.Log("You Win!");
                 yield break;
             }
@@ -170,6 +211,8 @@ namespace Core.Game
             if (_playerCharacter.GetCurrentHP() <= 0)
             {
                 ChangeBattleState(BattleState.Lose);
+                _playerCharController.Death();
+                //add screen, destroy enemy (NOT DONE)
                 Debug.Log("You Lose!");
                 yield break;
             }

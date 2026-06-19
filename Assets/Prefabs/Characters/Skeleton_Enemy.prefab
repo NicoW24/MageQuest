@@ -66,9 +66,9 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: c031c33f17e455c479e7095e13e83d42, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  moveSpeed: 3
   patrolDistance: 3
   patrolWaitTime: 1.5
-  _moveSpeed: 3
   _player: {fileID: 0}
   _detectionRadius: 5
   _stoppingDistance: 1.65

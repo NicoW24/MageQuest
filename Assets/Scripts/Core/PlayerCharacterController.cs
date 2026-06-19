@@ -6,9 +6,6 @@ namespace Core.Game
 {
     public class PlayerCharacterController : CharacterController
     {
-        [SerializeField] float _moveSpeed = 5;
-        int _dir = 1;
-
         [Header("Battle")]
         [SerializeField] PlayerWeaponObject _weaponObject;
 
@@ -38,45 +35,54 @@ namespace Core.Game
             //check direction
             if (Input.GetAxisRaw("Horizontal") > 0)
             {
-                //right is -1 since sprite is originally looking left
-                _dir = -1;
+                //right is -1 since sprite is originally looking left 
                 dir = Vector3.right;
-
-                _characterSPUM.transform.localScale = new Vector3(_dir, 1, 1);
                 moving = true;
             }
             if (Input.GetAxisRaw("Horizontal") < 0)
             {
                 //left is 1 since sprite is originally looking left
-                _dir = 1;
                 dir = Vector3.left;
-
-                _characterSPUM.transform.localScale = new Vector3(_dir, 1, 1);
                 moving = true;
             }
 
             //set move
             if (moving && _canMove)
             {
+                //flip sprite
+                FlipSprite(dir.x);
                 PlayStateAnimation(PlayerState.MOVE);
             }
 
             //move the character object
-            transform.localPosition += dir * _moveSpeed * Time.deltaTime;
+            transform.localPosition += dir * moveSpeed * Time.deltaTime;
+        }
+
+        public override void FlipSprite(float xdir)
+        {
+            //flip sprite
+            if (xdir > 0.01f)
+                _characterSPUM.transform.localScale = new Vector3(_initialSpriteDir, 1, 1);
+            else if (xdir < -0.01f)
+                _characterSPUM.transform.localScale = new Vector3(-_initialSpriteDir, 1, 1);
         }
 
         /// <summary>
         /// Player attack function
         /// </summary>
-        protected override void Attack()
+        public override void Attack()
         {
             base.Attack();
-            //get enemy character stat
-            CharacterStat enemy = _weaponObject.GetCurrentEnemy();
-            //if enemy detected start battle from player
-            if (enemy != null)
+            //add check before initiate battle
+            if (_canMove)
             {
-                BattleManager.Instance.StartBattle(enemy);
+                //get enemy character stat
+                CharacterStat enemy = _weaponObject.GetCurrentEnemy();
+                //if enemy detected start battle from player
+                if (enemy != null)
+                {
+                    BattleManager.Instance.StartBattle(enemy);
+                }
             }
         }
     }

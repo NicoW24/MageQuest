@@ -19,14 +19,13 @@ namespace Core.Game
         [SerializeField] float _currentMana;
         [SerializeField] float _currentSpeed;
 
-        void Start()
+        void Awake()
         {
             //check SO
-            if(characterDetailSO == null)
+            if (characterDetailSO == null)
             {
                 Debug.LogError("NO CHARACTER DETAIL DATA");
             }
-
             _characterController = GetComponent<CharacterController>();
         }
         /// <summary>

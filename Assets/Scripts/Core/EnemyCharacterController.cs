@@ -11,8 +11,6 @@ namespace Core.Game
         bool _waiting;
         float _waitTimer;
 
-        [SerializeField] float _moveSpeed = 5;
-
         [Header("Detection")]
         [SerializeField] Transform _player;
         [SerializeField] float _detectionRadius = 5f;
@@ -73,7 +71,7 @@ namespace Core.Game
                 return;
             }
 
-            MoveTowards(_targetPos, _moveSpeed);
+            MoveTowards(_targetPos, moveSpeed);
 
             if (Vector2.Distance(transform.position, _targetPos) < 0.1f)
             {
@@ -92,7 +90,7 @@ namespace Core.Game
 
             if (distanceToPlayer > _stoppingDistance)
             {
-                MoveTowards(_player.position, _moveSpeed * 1.5f);
+                MoveTowards(_player.position, moveSpeed * 1.5f);
             }
             else if (distanceToPlayer < _stoppingDistance)
             {
@@ -109,12 +107,15 @@ namespace Core.Game
             base.MoveTowards(destination, moveSpeed);
         }
 
-        protected override void Attack()
+        public override void Attack()
         {
             base.Attack();
-
-            //enemy start battle
-            BattleManager.Instance.StartBattle(_thisCharacterStat, true);
+            //add check before initiate battle
+            if (_canMove)
+            {
+                //enemy start battle
+                BattleManager.Instance.StartBattle(_thisCharacterStat, true);
+            }
         }
     }
 }
