@@ -119,12 +119,18 @@ namespace Core.Game
 
         #region Battle System
         #region Player Turn
+        /// <summary>
+        /// Function after player press attack button
+        /// </summary>
         public void OnPlayerAttack()
         {
             if(_currentBattleState != BattleState.PlayerTurn || !_playerCanDoAction)
                 return;
             StartCoroutine(PlayerAttack());
         }
+        /// <summary>
+        /// Coroutine for player attack turn
+        /// </summary>
         IEnumerator PlayerAttack()
         {
             _playerCanDoAction = false;
@@ -149,6 +155,9 @@ namespace Core.Game
         }
         #endregion
         #region Enemy Turn
+        /// <summary>
+        /// Coroutine for enemy attack turn
+        /// </summary>
         IEnumerator EnemyAttack()
         {
             yield return new WaitForSeconds(1f);
