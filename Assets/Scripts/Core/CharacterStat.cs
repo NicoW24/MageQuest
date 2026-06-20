@@ -18,6 +18,7 @@ namespace Core.Game
         [SerializeField] float _currentAttack;
         [SerializeField] float _currentMana;
         [SerializeField] float _currentSpeed;
+        public bool isDead = false;
 
         void Awake()
         {
@@ -42,6 +43,11 @@ namespace Core.Game
             }
             _currentHP -= damageIN;
             BattleGUIManager.Instance.UpdateHPUI();
+
+            if(_currentHP <= 0)
+            {
+                isDead = true;
+            }
         }
         public float GetMaxHP()
         {

@@ -17,7 +17,11 @@ namespace Core.Game
         {
             if (other.CompareTag("Enemy"))
             {
-                _currentEnemyInTrigger = other.GetComponent<CharacterStat>();
+                CharacterStat stat = other.GetComponent<CharacterStat>();
+                if (!stat.isDead)
+                {
+                    _currentEnemyInTrigger = stat;
+                }
             }
         }
 

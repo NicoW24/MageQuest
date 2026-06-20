@@ -110,12 +110,15 @@ namespace Core.Game
         public override void Attack()
         {
             base.Attack();
-            //add check before initiate battle
             if (_canMove)
             {
-                //enemy start battle
-                BattleManager.Instance.StartBattle(_thisCharacterStat, true);
+                StartCoroutine(WaitForAttackAnimation());
             }
+        }
+        private IEnumerator WaitForAttackAnimation()
+        {
+            yield return new WaitUntil(() => AnimationDone());
+            BattleManager.Instance.StartBattle(_thisCharacterStat, true);
         }
     }
 }

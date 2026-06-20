@@ -81,10 +81,6 @@ namespace Core.Game
             //set current enemy controller var
             _currentEnemyCharController = _enemyCharacter.GetController();
 
-            //set battle start position foreach char
-            _EnemyStartBattlePos = _currentEnemyCharController.transform.position;
-            _playerStartBattlePos = _playerCharController.transform.position;
-
             //invoke event to stop characters from moving
             OnBattleStarted?.Invoke();
 
@@ -124,6 +120,10 @@ namespace Core.Game
             Vector3 attackPos = _playerCharacter.transform.position + Vector3.right * 10f;
             _currentEnemy.transform.position = attackPos;
 
+            //set battle start position foreach char
+            _EnemyStartBattlePos = _currentEnemyCharController.transform.position;
+            _playerStartBattlePos = _playerCharController.transform.position;
+
             //setup battle GUI
             BattleGUIManager.Instance.SetupBattleGUI(_playerCharacter,_currentEnemy);
 
@@ -133,6 +133,14 @@ namespace Core.Game
                 _playerCanDoAction = false;
                 StartCoroutine(EnemyAttack());
             }
+        }
+        void BattleEnded()
+        {
+            //execute event
+            OnBattleEnded?.Invoke();
+            //close battle ui
+            PanelManager.Instance.ClosePanel("BattleGUI");
+            //let player loot enemy for skill (NOT DONE)
         }
 
         #region Battle System
@@ -168,6 +176,14 @@ namespace Core.Game
             //enemy take damage animation
             _currentEnemyCharController.TakeDamage();
             _currentEnemy.TakeDamage(damage);
+            //check win condition
+            if (_currentEnemy.GetCurrentHP() <= 0)
+            {
+                ChangeBattleState(BattleState.Win);
+                _currentEnemyCharController.Death();
+                BattleEnded();
+                yield break;
+            }
             //add delay before player go back to start pos
             yield return new WaitForSeconds(1.5f);
             //wait for player reach starting pos
@@ -178,15 +194,7 @@ namespace Core.Game
             }
             //make player char idle and flip sprite to be starting pos
             _playerCharController.Idle();
-            //check win condition
-            if (_currentEnemy.GetCurrentHP() <= 0)
-            {
-                ChangeBattleState(BattleState.Win);
-                _currentEnemyCharController.Death();
-                //add screen, destroy enemy (NOT DONE)
-                Debug.Log("You Win!");
-                yield break;
-            }
+
 
             yield return new WaitForSeconds(1f);
             //change turn
@@ -203,19 +211,40 @@ namespace Core.Game
         {
             yield return new WaitForSeconds(1f);
             float damage = _currentEnemy.GetCurrentAttack();
-            //enemy attack animation (NOT DONE)
-            //player take damage animation (NOT DONE)
-
+            //enemy attack animation
+            //wait for enemy reach player
+            while (Vector2.Distance(_currentEnemy.transform.position, _playerCharacter.transform.position) > 3f)
+            {
+                _currentEnemyCharController.MoveTowards(_playerCharacter.transform.position, 5f);
+                yield return null;
+            }
+            //set attack animation
+            _currentEnemyCharController.Attack();
+            while (!_currentEnemyCharController.AnimationDone())
+                yield return null;
+            //player take damage animation
+            _playerCharController.TakeDamage();
             _playerCharacter.TakeDamage(damage);
             //check lose condition
             if (_playerCharacter.GetCurrentHP() <= 0)
             {
                 ChangeBattleState(BattleState.Lose);
                 _playerCharController.Death();
-                //add screen, destroy enemy (NOT DONE)
-                Debug.Log("You Lose!");
+                BattleEnded();
                 yield break;
             }
+            //add delay before enemy go back to start pos
+            yield return new WaitForSeconds(1.5f);
+            //wait for enemy reach starting pos
+            while (Vector2.Distance(_currentEnemy.transform.position, _EnemyStartBattlePos) > 0f)
+            {
+                _currentEnemyCharController.MoveTowards(_EnemyStartBattlePos, 5f);
+                yield return null;
+            }
+            Debug.Log(Vector2.Distance(_currentEnemy.transform.position, _EnemyStartBattlePos));
+            //make enemy char idle and flip sprite to be starting pos
+            _currentEnemyCharController.Idle();
+
             //change turn
             ChangeBattleState(BattleState.PlayerTurn);
             BattleGUIManager.Instance.UpdateTurnUI();

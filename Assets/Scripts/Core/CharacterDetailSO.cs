@@ -13,7 +13,6 @@ namespace Core.Game
         Ice,
         Nature
     }
-
     /// <summary>
     /// This detail is used for enemy and player (character that can do battle)
     /// </summary>

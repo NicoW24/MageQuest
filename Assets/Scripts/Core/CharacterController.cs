@@ -34,7 +34,17 @@ namespace Core.Game
             _canMove = true;
             //add event battle started
             BattleManager.Instance.OnBattleStarted += BattleStarted;
-            BattleManager.Instance.OnBattleEnded += BattleStarted;
+            BattleManager.Instance.OnBattleEnded += BattleEnded;
+        }
+
+        /// <summary>
+        /// Remove event function
+        /// </summary>
+        void RemoveBattleEvent()
+        {
+            //remove event on disable
+            BattleManager.Instance.OnBattleStarted -= BattleStarted;
+            BattleManager.Instance.OnBattleEnded -= BattleEnded;
         }
 
         /// <summary>
@@ -42,9 +52,7 @@ namespace Core.Game
         /// </summary>
         void OnDisable()
         {
-            //remove event on disable
-            BattleManager.Instance.OnBattleStarted -= BattleStarted;
-            BattleManager.Instance.OnBattleEnded -= BattleStarted;
+            RemoveBattleEvent();
         }
 
         /// <summary>
@@ -128,19 +136,26 @@ namespace Core.Game
         public virtual void Death()
         {
             PlayStateAnimation(PlayerState.DEATH, 0);
+
+            //disable collider and rigidbody
+            GetComponent<BoxCollider2D>().enabled = false;
+            GetComponent<Rigidbody2D>().bodyType = RigidbodyType2D.Static;
+
+            //remove event on death
+            RemoveBattleEvent();
         }
 
         public void BattleStarted()
         {
+            _canMove = false;
             //set idle
             PlayStateAnimation(PlayerState.IDLE);
-            _canMove = false;
         }
         public void BattleEnded()
         {
+            _canMove = true;
             //set idle
             PlayStateAnimation(PlayerState.IDLE);
-            _canMove = true;
         }
     }
 }

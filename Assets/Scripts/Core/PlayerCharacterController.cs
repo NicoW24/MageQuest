@@ -76,13 +76,18 @@ namespace Core.Game
             //add check before initiate battle
             if (_canMove)
             {
-                //get enemy character stat
-                CharacterStat enemy = _weaponObject.GetCurrentEnemy();
-                //if enemy detected start battle from player
-                if (enemy != null)
-                {
-                    BattleManager.Instance.StartBattle(enemy);
-                }
+                StartCoroutine(WaitForAttackAnimation());
+            }
+        }
+        private IEnumerator WaitForAttackAnimation()
+        {
+            yield return new WaitUntil(() => AnimationDone());
+            //get enemy character stat
+            CharacterStat enemy = _weaponObject.GetCurrentEnemy();
+            //if enemy detected start battle from player
+            if (enemy != null)
+            {
+                BattleManager.Instance.StartBattle(enemy);
             }
         }
     }
