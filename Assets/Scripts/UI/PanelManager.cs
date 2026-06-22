@@ -73,10 +73,15 @@ namespace UI.Game
         /// </summary>
         public void CloseLastPanel()
         {
-            if( _lastOpenedPanel != null)
+            if( _lastOpenedPanel != null && _lastOpenedPanel.gameObject.activeSelf)
             {
                 _lastOpenedPanel.ClosePanel();
             }
+        }
+
+        public Panel GetPanel(string panelName)
+        {
+            return _listPanelSpawned[panelName];
         }
     }
 }

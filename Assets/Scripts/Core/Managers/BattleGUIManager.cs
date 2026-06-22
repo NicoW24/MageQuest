@@ -83,7 +83,11 @@ namespace Core.Game
         #region Player Action
         public void PlayerAttack()
         {
-            BattleManager.Instance.OnPlayerAttack();
+            BattleManager.Instance.OnPlayerAction(0);
+        }
+        public void PlayerDefend()
+        {
+            BattleManager.Instance.OnPlayerAction(1);
         }
         #endregion
     }

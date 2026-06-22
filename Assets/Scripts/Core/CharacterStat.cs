@@ -29,6 +29,13 @@ namespace Core.Game
             }
             _characterController = GetComponent<CharacterController>();
         }
+
+        void Start()
+        {
+            //reset stat
+            BattleManager.Instance.OnPlayAgain += SetupCharacter;
+        }
+
         /// <summary>
         /// Damage function
         /// </summary>

@@ -1,3 +1,5 @@
+using System;
+using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
@@ -10,7 +12,14 @@ namespace Core.Game
 
         public float moveSpeed = 5;
         protected bool _canMove;
-        protected float _initialSpriteDir;//starting char sprite direction 
+        protected bool _isAlive = true;//another variable to stop update function that controls the character when character is not alive 
+        protected float _initialSpriteDir;//starting char sprite direction
+        protected Vector2 _initialCharPos;
+
+        [Header("Effects")]
+        public Transform effectContainer;
+        protected ParticleSystem _currentUsedParticle;
+        protected Dictionary<string, ParticleSystem> _spawnedParticles = new Dictionary<string, ParticleSystem>();
 
         public Dictionary<PlayerState, int> IndexPair = new();
 
@@ -31,10 +40,18 @@ namespace Core.Game
                 _characterSPUM.OverrideControllerInit();
             }
             _initialSpriteDir = _characterSPUM.transform.localScale.x;
+            _initialCharPos = _characterSPUM.transform.position;
             _canMove = true;
+            AddBattleEvent();
+        }
+
+        void AddBattleEvent()
+        {
             //add event battle started
             BattleManager.Instance.OnBattleStarted += BattleStarted;
             BattleManager.Instance.OnBattleEnded += BattleEnded;
+            //reset pos and animation
+            BattleManager.Instance.OnPlayAgain += RestartCharacter;
         }
 
         /// <summary>
@@ -45,6 +62,8 @@ namespace Core.Game
             //remove event on disable
             BattleManager.Instance.OnBattleStarted -= BattleStarted;
             BattleManager.Instance.OnBattleEnded -= BattleEnded;
+            //reset pos and animation
+            BattleManager.Instance.OnPlayAgain -= RestartCharacter;
         }
 
         /// <summary>
@@ -124,6 +143,10 @@ namespace Core.Game
             PlayStateAnimation(PlayerState.IDLE);
         }
         /// <summary>
+        /// Character defend function
+        /// </summary>
+        public virtual void Defend(){}
+        /// <summary>
         /// Character take damage function
         /// </summary>
         public virtual void TakeDamage()
@@ -140,23 +163,71 @@ namespace Core.Game
             //disable collider and rigidbody
             GetComponent<BoxCollider2D>().enabled = false;
             GetComponent<Rigidbody2D>().bodyType = RigidbodyType2D.Static;
-
-            //remove event on death
-            RemoveBattleEvent();
+            _isAlive = false;
         }
-
+        public void RestartCharacter()
+        {
+            //reset animation
+            PlayStateAnimation(PlayerState.IDLE);
+            //reset pos and variables
+            transform.position = _initialCharPos;
+            _isAlive = true;
+            _canMove = true;
+            //reenable collider and rigidbody
+            GetComponent<BoxCollider2D>().enabled = true;
+            GetComponent<Rigidbody2D>().bodyType = RigidbodyType2D.Dynamic;
+        }
+        public bool IsAlive()
+        {
+            return _isAlive;
+        }
         public void BattleStarted()
         {
+            if (!IsAlive())
+            {
+                return;
+            }
             _canMove = false;
             //set idle
             PlayStateAnimation(PlayerState.IDLE);
         }
         public void BattleEnded()
         {
+            if (!IsAlive())
+            {
+                return;
+            }
             _canMove = true;
             //set idle
             PlayStateAnimation(PlayerState.IDLE);
         }
+
+        #region Coroutine for particle and animation
+        /// <summary>
+        /// Coroutine to disable particle system after particle died
+        /// </summary>
+        protected IEnumerator DisableParticleAfterPlay()
+        {
+            yield return new WaitUntil(() => !_currentUsedParticle.IsAlive(true));
+            _currentUsedParticle.gameObject.SetActive(false);
+        }
+        /// <summary>
+        /// Coroutine to add delay after playing animation before action
+        /// </summary>
+        protected IEnumerator WaitForAnimationToSpawn(float sec, Action callback)
+        {
+            yield return new WaitForSeconds(sec);
+            callback?.Invoke();
+        }
+        /// <summary>
+        /// Coroutine wait for animation
+        /// </summary>
+        protected IEnumerator WaitForAnimation(Action callback)
+        {
+            yield return new WaitUntil(AnimationDone);
+            callback?.Invoke();
+        }
+        #endregion
     }
 }
 

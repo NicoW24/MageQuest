@@ -2,8 +2,9 @@
 %TAG !u! tag:unity3d.com,2011:
 --- !u!78 &1
 TagManager:
-  serializedVersion: 2
-  tags: []
+  serializedVersion: 3
+  tags:
+  - Enemy
   layers:
   - Default
   - TransparentFX
@@ -47,9 +48,14 @@ TagManager:
   - name: Character
     uniqueID: 3437124797
     locked: 0
+  - name: Particle
+    uniqueID: 3981620267
+    locked: 0
   - name: Foreground
     uniqueID: 2835508771
     locked: 0
   - name: UI
     uniqueID: 1857812815
     locked: 0
+  m_RenderingLayers:
+  - Default

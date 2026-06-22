@@ -1,5 +1,7 @@
+using System;
 using System.Collections;
 using System.Collections.Generic;
+using System.Linq;
 using UnityEngine;
 
 namespace Core.Game
@@ -9,9 +11,22 @@ namespace Core.Game
         [Header("Battle")]
         [SerializeField] PlayerWeaponObject _weaponObject;
 
+        [Header("Effects")]
+        [SerializeField] ParticleSystem _defenseParticle;
+
+        public override void Start()
+        {
+            base.Start();
+
+            //setup character particle
+            ParticleSystem def = Instantiate(_defenseParticle, effectContainer);
+            _spawnedParticles.Add(_defenseParticle.name, def);
+            def.gameObject.SetActive(false);
+        }
+
         void Update()
         {
-            if (!_canMove)
+            if (!_canMove || !_isAlive)
             {
                 return;
             }
@@ -57,7 +72,9 @@ namespace Core.Game
             //move the character object
             transform.localPosition += dir * moveSpeed * Time.deltaTime;
         }
-
+        /// <summary>
+        /// Player flip sprite function
+        /// </summary>
         public override void FlipSprite(float xdir)
         {
             //flip sprite
@@ -66,7 +83,6 @@ namespace Core.Game
             else if (xdir < -0.01f)
                 _characterSPUM.transform.localScale = new Vector3(-_initialSpriteDir, 1, 1);
         }
-
         /// <summary>
         /// Player attack function
         /// </summary>
@@ -76,12 +92,14 @@ namespace Core.Game
             //add check before initiate battle
             if (_canMove)
             {
-                StartCoroutine(WaitForAttackAnimation());
+                StartCoroutine(WaitForAnimation(StartBattle));
             }
         }
-        private IEnumerator WaitForAttackAnimation()
+        /// <summary>
+        /// Player start battle function
+        /// </summary>
+        void StartBattle()
         {
-            yield return new WaitUntil(() => AnimationDone());
             //get enemy character stat
             CharacterStat enemy = _weaponObject.GetCurrentEnemy();
             //if enemy detected start battle from player
@@ -89,6 +107,25 @@ namespace Core.Game
             {
                 BattleManager.Instance.StartBattle(enemy);
             }
+        }
+        /// <summary>
+        /// Player defend function
+        /// </summary>
+        public override void Defend()
+        {
+            PlayStateAnimation(PlayerState.OTHER, 3);
+            StartCoroutine(WaitForAnimationToSpawn(1.2f,SpawnParticleDefend));
+        }
+        /// <summary>
+        /// Spawn defend particle
+        /// </summary>
+        public void SpawnParticleDefend()
+        {
+            _currentUsedParticle = _spawnedParticles.Where(x => x.Key == _defenseParticle.name).FirstOrDefault().Value;
+            _currentUsedParticle.gameObject.SetActive(true);
+            _currentUsedParticle.Clear();
+            _currentUsedParticle.Emit(1);
+            StartCoroutine(DisableParticleAfterPlay());
         }
     }
 }

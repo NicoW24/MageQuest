@@ -30,8 +30,11 @@ namespace Core.Game
         CharacterController _currentEnemyCharController;
         Vector3 _EnemyStartBattlePos;
 
+        bool _playerDefend = false;
+
         public UnityAction OnBattleStarted;
         public UnityAction OnBattleEnded;
+        public UnityAction OnPlayAgain;
 
         public static BattleManager Instance;
 
@@ -48,6 +51,8 @@ namespace Core.Game
             _currentBattleState = BattleState.NoBattle;
             //set player controller var
             _playerCharController = _playerCharacter.GetController();
+            //get game over panel to add playagain function
+            PanelManager.Instance.GetPanel("GameOverSplashscreen").GetComponent<GameOverPanel>().OnPlayAgain += PlayAgain;
         }
         /// <summary>
         /// Function to get player character object
@@ -134,25 +139,54 @@ namespace Core.Game
                 StartCoroutine(EnemyAttack());
             }
         }
+        /// <summary>
+        /// When player pick play again restart all character pos and stat
+        /// </summary>
+        void PlayAgain()
+        {
+            OnPlayAgain?.Invoke();
+        }
+        /// <summary>
+        /// Battle ended function
+        /// </summary>
         void BattleEnded()
         {
-            //execute event
-            OnBattleEnded?.Invoke();
             //close battle ui
             PanelManager.Instance.ClosePanel("BattleGUI");
-            //let player loot enemy for skill (NOT DONE)
+            if (_currentBattleState == BattleState.Lose)
+            {
+                //open gameover panel
+                PanelManager.Instance.OpenPanel("GameOverSplashscreen");
+            }
+            else
+            {
+                //execute event, currently the event is resuming player control and alive enemy AI patrol and chase
+                OnBattleEnded?.Invoke();
+                //let player loot enemy (NOT DONE)
+
+                //Make minigame first (NOT DONE)
+            }
         }
 
         #region Battle System
         #region Player Turn
         /// <summary>
-        /// Function after player press attack button
+        /// Function after player press action button
         /// </summary>
-        public void OnPlayerAttack()
+        public void OnPlayerAction(float actionCode)//0 attack 1 defend
         {
             if(_currentBattleState != BattleState.PlayerTurn || !_playerCanDoAction)
                 return;
-            StartCoroutine(PlayerAttack());
+
+           switch (actionCode)
+            {
+                case 0:
+                    StartCoroutine(PlayerAttack());
+                    break;
+                case 1:
+                    StartCoroutine(PlayerDefend());
+                    break;
+            }
         }
         /// <summary>
         /// Coroutine for player attack turn
@@ -175,7 +209,7 @@ namespace Core.Game
                 yield return null;
             //enemy take damage animation
             _currentEnemyCharController.TakeDamage();
-            _currentEnemy.TakeDamage(damage);
+            _currentEnemy.TakeDamage(damage,true);//enemy always use defense stat
             //check win condition
             if (_currentEnemy.GetCurrentHP() <= 0)
             {
@@ -195,6 +229,29 @@ namespace Core.Game
             //make player char idle and flip sprite to be starting pos
             _playerCharController.Idle();
 
+
+            yield return new WaitForSeconds(1f);
+            //change turn
+            ChangeBattleState(BattleState.EnemyTurn);
+            BattleGUIManager.Instance.UpdateTurnUI();
+            StartCoroutine(EnemyAttack());
+        }
+        /// <summary>
+        /// Coroutine for player defend turn
+        /// </summary>
+        IEnumerator PlayerDefend()
+        {
+            _playerCanDoAction = false;
+
+            //player defend animation
+            //set defend animation
+            _playerCharController.Defend();
+            //enable player defend
+            _playerDefend = true;
+            while (!_playerCharController.AnimationDone())
+                yield return null;
+            //make player char idle and flip sprite to be starting pos
+            _playerCharController.Idle();
 
             yield return new WaitForSeconds(1f);
             //change turn
@@ -224,7 +281,12 @@ namespace Core.Game
                 yield return null;
             //player take damage animation
             _playerCharController.TakeDamage();
-            _playerCharacter.TakeDamage(damage);
+            _playerCharacter.TakeDamage(damage,_playerDefend);
+            //after defend stop the defend
+            if (_playerDefend)
+            {
+                _playerDefend = false;
+            }
             //check lose condition
             if (_playerCharacter.GetCurrentHP() <= 0)
             {

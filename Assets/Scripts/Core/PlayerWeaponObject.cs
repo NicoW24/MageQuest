@@ -12,7 +12,9 @@ namespace Core.Game
         {
             BattleManager.Instance.OnBattleEnded += BattleEnded;
         }
-
+        /// <summary>
+        /// Collider detection for enemy
+        /// </summary>
         void OnTriggerEnter2D(Collider2D other)
         {
             if (other.CompareTag("Enemy"))
@@ -24,12 +26,16 @@ namespace Core.Game
                 }
             }
         }
-
+        /// <summary>
+        /// Return current detected enemy
+        /// </summary>
         public CharacterStat GetCurrentEnemy()
         {
             return _currentEnemyInTrigger;
         }
-
+        /// <summary>
+        /// When battle ended reset current enemy variable
+        /// </summary>
         public void BattleEnded()
         {
             _currentEnemyInTrigger = null;

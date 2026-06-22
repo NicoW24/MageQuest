@@ -153,4 +153,5 @@ MonoBehaviour:
   _listPanel:
   - {fileID: 5113427324186884480, guid: 3936755d33ad335439e5064e6369ae25, type: 3}
   - {fileID: 3541067732460761202, guid: 376a0500eecadf84db75cac83aa0b724, type: 3}
+  - {fileID: 8861994389114470923, guid: c4f433efe861dd94e95650db276e6175, type: 3}
   _panelContainer: {fileID: 1066483830989863514}

@@ -1,5 +1,6 @@
 using System.Collections;
 using System.Collections.Generic;
+using TMPro;
 using UnityEngine;
 
 namespace UI.Game
@@ -19,7 +20,7 @@ namespace UI.Game
         public override void OpenPanel()
         {
             base.OpenPanel();
-            //play animation
+            //play animation, from the first frame
             _animator.Play(0, 0, 0f);
         }
 

@@ -39,7 +39,7 @@ namespace Core.Game
 
         void Update()
         {
-            if (!_canMove)
+            if (!_canMove || !_isAlive)
             {
                 return;
             }
@@ -101,24 +101,20 @@ namespace Core.Game
 
             _waiting = false;
         }
-
-        public override void MoveTowards(Vector2 destination, float moveSpeed)
-        {
-            base.MoveTowards(destination, moveSpeed);
-        }
-
+        /// <summary>
+        /// Enemy attack function, enemy start battle
+        /// </summary>
         public override void Attack()
         {
             base.Attack();
             if (_canMove)
             {
-                StartCoroutine(WaitForAttackAnimation());
+                StartCoroutine(WaitForAnimation(() =>
+                {
+                    //start battle after attack animation
+                    BattleManager.Instance.StartBattle(_thisCharacterStat, true);
+                }));
             }
-        }
-        private IEnumerator WaitForAttackAnimation()
-        {
-            yield return new WaitUntil(() => AnimationDone());
-            BattleManager.Instance.StartBattle(_thisCharacterStat, true);
         }
     }
 }

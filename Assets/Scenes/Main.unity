@@ -263,6 +263,10 @@ PrefabInstance:
       propertyPath: m_Name
       value: Player_MainChar
       objectReference: {fileID: 0}
+    - target: {fileID: 6960397765709536460, guid: e084d532896efda4fb426695601bff9d, type: 3}
+      propertyPath: _defenseParticle
+      value: 
+      objectReference: {fileID: 8473906802122472069, guid: 01a554df9b55e7f49acbf68aee6c7f35, type: 3}
     - target: {fileID: 8825485570132366074, guid: e084d532896efda4fb426695601bff9d, type: 3}
       propertyPath: m_LocalPosition.x
       value: 0
