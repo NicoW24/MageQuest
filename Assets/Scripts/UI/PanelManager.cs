@@ -22,14 +22,10 @@ namespace UI.Game
             {
                 Instance = this;
             }
-        }
-
-        void Start()
-        {
             //spawn panel from prefab to canvas
-            foreach(Panel panel in _listPanel)
+            foreach (Panel panel in _listPanel)
             {
-                Panel newPanel = Instantiate(panel,_panelContainer);
+                Panel newPanel = Instantiate(panel, _panelContainer);
                 newPanel.ClosePanel();
                 string panelName = panel.name.Replace("_Panel", "");
                 _listPanelSpawned.Add(panelName, newPanel);
