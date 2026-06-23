@@ -44,6 +44,15 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: accac2173b7c61a4098dbe39c284b117, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  _currentTurn: 0
+  _currentBattleState: 0
   _currentCharactersInBattle: []
+  listAllCharacterSkill:
+  - {fileID: 11400000, guid: e270a09bc27bd004db16d3d4629f5773, type: 2}
+  - {fileID: 11400000, guid: 571df3a03a820654aaf8669d61ebf1ad, type: 2}
+  - {fileID: 11400000, guid: 91a511dc46acd6847a384a771c802abb, type: 2}
+  - {fileID: 11400000, guid: 3bf863475b8f1164aa4899e1952c883e, type: 2}
+  - {fileID: 11400000, guid: 73144bc730d05024297eef7719b0a5c8, type: 2}
+  - {fileID: 11400000, guid: 0aac3e3e013c5bb4bbd539851342c038, type: 2}
   _playerCharacter: {fileID: 0}
+  _currentEnemy: {fileID: 0}
+  _lootChestObject: {fileID: 0}

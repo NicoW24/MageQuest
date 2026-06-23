@@ -57,7 +57,10 @@ namespace UI.Game
                 {
                     _lastOpenedPanel = null;
                 }
-                panel.ClosePanel();
+
+                //only close opened panel
+                if(panel.gameObject.activeSelf)
+                    panel.ClosePanel();
             }
             else
             {

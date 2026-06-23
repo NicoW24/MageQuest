@@ -160,6 +160,7 @@ GameObject:
   m_Component:
   - component: {fileID: 3437096826417392329}
   - component: {fileID: 273463215972799721}
+  - component: {fileID: 8395822737795315914}
   m_Layer: 5
   m_Name: PlayerHPBar
   m_TagString: Untagged
@@ -183,9 +184,9 @@ RectTransform:
   - {fileID: 2915157903094697886}
   m_Father: {fileID: 260258463666372198}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
-  m_AnchorMin: {x: 0, y: 0.5}
-  m_AnchorMax: {x: 0, y: 0.5}
-  m_AnchoredPosition: {x: 480, y: -460}
+  m_AnchorMin: {x: 0.5, y: 0.5}
+  m_AnchorMax: {x: 0.5, y: 0.5}
+  m_AnchoredPosition: {x: -480, y: -460}
   m_SizeDelta: {x: 300, y: 100}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!114 &273463215972799721
@@ -239,6 +240,19 @@ MonoBehaviour:
   m_OnValueChanged:
     m_PersistentCalls:
       m_Calls: []
+--- !u!114 &8395822737795315914
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1485696460215413755}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: e076156fbb265c6429c65e539b491503, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: UI.Game::UI.Game.HPBarFollowCharacter
+  followTarget: {fileID: 0}
 --- !u!1 &1735727182349444873
 GameObject:
   m_ObjectHideFlags: 0
@@ -1037,6 +1051,7 @@ GameObject:
   m_Component:
   - component: {fileID: 3578940396002437168}
   - component: {fileID: 1826630065546627892}
+  - component: {fileID: 7165783661212722849}
   m_Layer: 5
   m_Name: EnemyHPBar
   m_TagString: Untagged
@@ -1060,9 +1075,9 @@ RectTransform:
   - {fileID: 4487570225541005137}
   m_Father: {fileID: 260258463666372198}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
-  m_AnchorMin: {x: 1, y: 0.5}
-  m_AnchorMax: {x: 1, y: 0.5}
-  m_AnchoredPosition: {x: -480, y: -460}
+  m_AnchorMin: {x: 0.5, y: 0.5}
+  m_AnchorMax: {x: 0.5, y: 0.5}
+  m_AnchoredPosition: {x: 480, y: -460}
   m_SizeDelta: {x: 300, y: 100}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!114 &1826630065546627892
@@ -1116,6 +1131,19 @@ MonoBehaviour:
   m_OnValueChanged:
     m_PersistentCalls:
       m_Calls: []
+--- !u!114 &7165783661212722849
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 6401906170403467888}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: e076156fbb265c6429c65e539b491503, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: UI.Game::UI.Game.HPBarFollowCharacter
+  followTarget: {fileID: 0}
 --- !u!1 &7159872604466972649
 GameObject:
   m_ObjectHideFlags: 0

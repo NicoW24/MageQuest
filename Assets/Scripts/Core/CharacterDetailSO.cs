@@ -29,6 +29,5 @@ namespace Core.Game
         public float Def;
         public float Attack;
         public float Mana;
-        public float Speed;
     }
 }

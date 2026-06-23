@@ -110,12 +110,12 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 0cd44c1031e13a943bb63640046fad76, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  m_UiScaleMode: 0
+  m_UiScaleMode: 1
   m_ReferencePixelsPerUnit: 100
   m_ScaleFactor: 1
-  m_ReferenceResolution: {x: 800, y: 600}
+  m_ReferenceResolution: {x: 1920, y: 1080}
   m_ScreenMatchMode: 0
-  m_MatchWidthOrHeight: 0
+  m_MatchWidthOrHeight: 0.5
   m_PhysicalUnit: 3
   m_FallbackScreenDPI: 96
   m_DefaultSpriteDPI: 96
@@ -153,5 +153,8 @@ MonoBehaviour:
   _listPanel:
   - {fileID: 5113427324186884480, guid: 3936755d33ad335439e5064e6369ae25, type: 3}
   - {fileID: 3541067732460761202, guid: 376a0500eecadf84db75cac83aa0b724, type: 3}
+  - {fileID: 6786709294525456759, guid: a572c71bb6efaff498e8f615e8a2fd29, type: 3}
+  - {fileID: 2733739896959831834, guid: cb3303d61074578408b548294f081360, type: 3}
+  - {fileID: 320996722393762565, guid: 3f056f87b5354034b82b3668c6641058, type: 3}
   - {fileID: 8861994389114470923, guid: c4f433efe861dd94e95650db276e6175, type: 3}
   _panelContainer: {fileID: 1066483830989863514}

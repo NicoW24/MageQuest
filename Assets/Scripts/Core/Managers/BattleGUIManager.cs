@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using TMPro;
 using UnityEngine;
 using UnityEngine.UI;
+using UI.Game;
 
 namespace Core.Game
 {
@@ -33,6 +34,12 @@ namespace Core.Game
             _PlayerHPBar.maxValue = _player.GetMaxHP();
             _EnemyHPBar.maxValue = _enemy.GetMaxHP();
 
+            //activate hp bar follow
+            HPBarFollowCharacter hpBarFollowPlayer = _PlayerHPBar.GetComponent<HPBarFollowCharacter>();
+            hpBarFollowPlayer.SetFollow(player.transform);
+            HPBarFollowCharacter hpBarFollowEnemy = _EnemyHPBar.GetComponent<HPBarFollowCharacter>();
+            hpBarFollowEnemy.SetFollow(enemy.transform);
+
             UpdateHPUI();
         }
         /// <summary>
@@ -55,11 +62,9 @@ namespace Core.Game
             if (_enemyHpRoutine != null)
                 StopCoroutine(_enemyHpRoutine);
 
-            _playerHpRoutine =
-                StartCoroutine(AnimateHPBar(_player.GetCurrentHP(), _PlayerHPBar));
+            _playerHpRoutine = StartCoroutine(AnimateHPBar(_player.GetCurrentHP(), _PlayerHPBar));
 
-            _enemyHpRoutine =
-                StartCoroutine(AnimateHPBar(_enemy.GetCurrentHP(), _EnemyHPBar));
+            _enemyHpRoutine = StartCoroutine(AnimateHPBar(_enemy.GetCurrentHP(), _EnemyHPBar));
         }
         /// <summary>
         /// Animate HP Bar
@@ -88,6 +93,11 @@ namespace Core.Game
         public void PlayerDefend()
         {
             BattleManager.Instance.OnPlayerAction(1);
+        }
+        public void PlayerSkill()
+        {
+            //show skill selection UI (NOT DONE)
+            BattleManager.Instance.OnPlayerAction(2);
         }
         #endregion
     }

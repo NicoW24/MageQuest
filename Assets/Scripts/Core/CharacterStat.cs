@@ -17,7 +17,10 @@ namespace Core.Game
         [SerializeField] float _currentDef;
         [SerializeField] float _currentAttack;
         [SerializeField] float _currentMana;
-        [SerializeField] float _currentSpeed;
+        Elements _currentElement;
+
+        public List<CharacterSkillSO> listOwnedSkill = new List<CharacterSkillSO>();
+
         public bool isDead = false;
 
         void Awake()
@@ -37,7 +40,30 @@ namespace Core.Game
         }
 
         /// <summary>
-        /// Damage function
+        /// Change character element
+        /// </summary>
+        public void ChangeElement(Elements el)
+        {
+            _currentElement = el;
+        }
+        /// <summary>
+        /// Skill weakness check, if weakness ad 2x damage value
+        /// </summary>
+        public bool IsSkillWeakness(Elements skillElement)
+        {
+            switch (skillElement)
+            {
+                case Elements.Fire:
+                    return _currentElement == Elements.Ice;
+                case Elements.Ice:
+                    return _currentElement == Elements.Nature;
+                case Elements.Nature:
+                    return _currentElement == Elements.Fire;
+            }
+            return false;
+        }
+        /// <summary>
+        /// Take damage function
         /// </summary>
         public void TakeDamage(float damageValue,bool defend = false)
         {
@@ -82,15 +108,21 @@ namespace Core.Game
             _currentDef = characterDetailSO.Def;
             _currentAttack = characterDetailSO.Attack;
             _currentMana = characterDetailSO.Mana;
-            _currentSpeed = characterDetailSO.Speed;
+            _currentElement = characterDetailSO.characterElement;
         }
-
         /// <summary>
         /// Return character controller, use for battle
         /// </summary>
         public CharacterController GetController()
         {
             return _characterController;
+        }
+        /// <summary>
+        /// Add new skill
+        /// </summary>
+        public void AddSkill(CharacterSkillSO skill)
+        {
+            listOwnedSkill.Add(skill);
         }
     }
 }

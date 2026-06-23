@@ -2,6 +2,7 @@ using System.Collections.Generic;
 using System.Linq;
 using TMPro;
 using UnityEngine;
+using UnityEngine.Events;
 
 namespace Core.Game
 {
@@ -21,6 +22,19 @@ namespace Core.Game
         int _currentIndex;
         float _timer;
         bool _isPlaying;
+
+        public UnityAction OnWinMinigame;
+        public UnityAction OnLoseMinigame;
+
+        public static SequenceMinigameManager Instance;
+
+        void Awake()
+        {
+            if (Instance == null) 
+            {
+                Instance = this;
+            }
+        }
 
         /// <summary>
         /// Start sequence minigame
@@ -198,6 +212,7 @@ namespace Core.Game
         void MinigameWin()
         {
             _isPlaying = false;
+            OnWinMinigame?.Invoke();
         }
         /// <summary>
         /// Minigame lose function
@@ -205,6 +220,7 @@ namespace Core.Game
         void MinigameLose()
         {
             _isPlaying = false;
+            OnLoseMinigame?.Invoke();
         }
     }
 }

@@ -137,9 +137,9 @@ namespace Core.Game
         /// <summary>
         /// Character attack function
         /// </summary>
-        public virtual void Attack()
+        public virtual void Attack(int animationIndex=0)
         {
-            PlayStateAnimation(PlayerState.ATTACK, 0);
+            PlayStateAnimation(PlayerState.ATTACK, animationIndex);
             PlayStateAnimation(PlayerState.IDLE);
         }
         /// <summary>
@@ -167,6 +167,11 @@ namespace Core.Game
         }
         public void RestartCharacter()
         {
+            if (!gameObject.activeSelf)
+            {
+                gameObject.SetActive(true);
+            }
+
             //reset animation
             PlayStateAnimation(PlayerState.IDLE);
             //reset pos and variables

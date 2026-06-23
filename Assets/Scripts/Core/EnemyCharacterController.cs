@@ -104,9 +104,9 @@ namespace Core.Game
         /// <summary>
         /// Enemy attack function, enemy start battle
         /// </summary>
-        public override void Attack()
+        public override void Attack(int animationIndex = 0)
         {
-            base.Attack();
+            base.Attack(animationIndex);
             if (_canMove)
             {
                 StartCoroutine(WaitForAnimation(() =>

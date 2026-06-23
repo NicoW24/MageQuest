@@ -54,7 +54,7 @@ MonoBehaviour:
   _currentDef: 0
   _currentAttack: 0
   _currentMana: 0
-  _currentSpeed: 0
+  listOwnedSkill: []
   isDead: 0
 --- !u!114 &6960397765709536460
 MonoBehaviour:
@@ -70,6 +70,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   moveSpeed: 8
   effectContainer: {fileID: 6837578139028124815}
+  _currentInteractableObject: {fileID: 0}
   _weaponObject: {fileID: 3621313303179098070}
   _defenseParticle: {fileID: 8473906802122472069, guid: 01a554df9b55e7f49acbf68aee6c7f35, type: 3}
 --- !u!50 &1299344841010022288

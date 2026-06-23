@@ -8,6 +8,9 @@ namespace Core.Game
 {
     public class PlayerCharacterController : CharacterController
     {
+        [Header("Interactable")]
+        [SerializeField] InteractableObject _currentInteractableObject;
+
         [Header("Battle")]
         [SerializeField] PlayerWeaponObject _weaponObject;
 
@@ -34,6 +37,10 @@ namespace Core.Game
             if (Input.GetKeyDown(KeyCode.Mouse0))
             {
                 Attack();
+            }
+            if (Input.GetKeyDown(KeyCode.Space))
+            {
+                PlayerInteract();
             }
             PlayerMove();
         }
@@ -86,9 +93,9 @@ namespace Core.Game
         /// <summary>
         /// Player attack function
         /// </summary>
-        public override void Attack()
+        public override void Attack(int animationIndex = 0)
         {
-            base.Attack();
+            base.Attack(animationIndex);
             //add check before initiate battle
             if (_canMove)
             {
@@ -117,7 +124,7 @@ namespace Core.Game
             StartCoroutine(WaitForAnimationToSpawn(1.2f,SpawnParticleDefend));
         }
         /// <summary>
-        /// Spawn defend particle
+        /// Spawn player defend particle
         /// </summary>
         public void SpawnParticleDefend()
         {
@@ -126,6 +133,33 @@ namespace Core.Game
             _currentUsedParticle.Clear();
             _currentUsedParticle.Emit(1);
             StartCoroutine(DisableParticleAfterPlay());
+        }
+        /// <summary>
+        /// Set current interactable object
+        /// </summary>
+        public void SetInteractableObject(InteractableObject obj)
+        {
+            _currentInteractableObject = obj;
+        }
+        /// <summary>
+        /// Player interact object function
+        /// </summary>
+        public void PlayerInteract()
+        {
+            if(_currentInteractableObject == null)
+            {
+                return;
+            }
+
+            switch (_currentInteractableObject.interactObjectType)
+            {
+                case InteractObjectType.Chest:
+                    _currentInteractableObject.GetChestObject().OpenChest();
+                    break;
+                case InteractObjectType.Npc:
+                    //open dialog (NOT DONE)
+                    break;
+            }
         }
     }
 }
