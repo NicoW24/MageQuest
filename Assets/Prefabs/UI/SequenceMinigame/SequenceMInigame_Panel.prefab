@@ -75,7 +75,7 @@ GameObject:
   - component: {fileID: 6786709294525456759}
   - component: {fileID: 3386629818070565888}
   m_Layer: 5
-  m_Name: SequenceMInigame_Panel
+  m_Name: SequenceMinigame_Panel
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0

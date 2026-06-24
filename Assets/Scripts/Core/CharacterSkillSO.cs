@@ -39,5 +39,6 @@ namespace Core.Game
         [Header("Skill Animation")]
         public ParticleSystem skillParticle;//skill particle effect
         public int skillAttackAnimationIndex;//casting animation index
+        public bool shouldShoot;//if shoot spawn from weapon to enemy, if not shoot spawn under enemy feet
     }
 }

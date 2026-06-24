@@ -37,13 +37,16 @@ namespace Core.Game
             _PlayerManaBar.maxValue = _player.GetMaxMana();
 
             //activate hp bar follow
-            HPBarFollowCharacter hpBarFollowPlayer = _PlayerHPBar.GetComponent<HPBarFollowCharacter>();
+            HPBarFollowCharacter hpBarFollowPlayer = _PlayerHPBar.GetComponentInParent<HPBarFollowCharacter>();
             hpBarFollowPlayer.SetFollow(player.transform);
             HPBarFollowCharacter hpBarFollowEnemy = _EnemyHPBar.GetComponent<HPBarFollowCharacter>();
             hpBarFollowEnemy.SetFollow(enemy.transform);
 
             UpdateHPUI();
             UpdateManaUI();
+
+            //close skill
+            PlayerSkillActionPanelManager.Instance.ClosePanel();
         }
         /// <summary>
         /// Update turn text
@@ -116,8 +119,10 @@ namespace Core.Game
         /// </summary>
         public void PlayerSkill()
         {
-            //show skill selection UI (NOT DONE)
-            BattleManager.Instance.OnPlayerAction(2);
+            if (BattleManager.Instance.GetTurnString().Contains("Player"))
+            {
+                PlayerSkillActionPanelManager.Instance.OpenPanel();
+            }
         }
         #endregion
     }

@@ -95,6 +95,10 @@ namespace Core.Game
         /// </summary>
         public void AddMana(float value)
         {
+            if(_currentMana == GetMaxMana())
+            {
+                return;
+            }
             _currentMana = _currentMana + value;
             BattleGUIManager.Instance.UpdateManaUI();
         }

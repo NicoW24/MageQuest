@@ -1,6 +1,7 @@
 using System;
 using System.Collections;
 using System.Collections.Generic;
+using System.Linq;
 using UnityEngine;
 
 namespace Core.Game
@@ -212,6 +213,24 @@ namespace Core.Game
             _canMove = true;
             //set idle
             PlayStateAnimation(PlayerState.IDLE);
+        }
+        public void SpawnParticleSkill(ParticleSystem ps, bool shoot, CharacterController target)//if shoot false spawn at enemy
+        {
+            _currentUsedParticle = _spawnedParticles.Where(x => x.Key == ps.name).FirstOrDefault().Value;
+            if (_currentUsedParticle == null)
+            {
+                ParticleSystem newPs = Instantiate(ps, effectContainer);
+                _spawnedParticles.Add(ps.name, newPs);
+                _currentUsedParticle = newPs;
+            }
+            _currentUsedParticle.Clear();
+            //if not shoot spawn at target
+            if (!shoot)
+            {
+                _currentUsedParticle.transform.position = target.transform.position + Vector3.up;
+            }
+            _currentUsedParticle.Emit(1);
+            StartCoroutine(DisableParticleAfterPlay());
         }
 
         #region Coroutine for particle and animation

@@ -211,7 +211,6 @@ namespace Core.Game
             //stop player defend after taken damage, if player is defending
             if (_playerDefend)
                 _playerDefend = false;
-
             //check win condition
             if (damageTo.GetCurrentHP() <= 0)
             {
@@ -219,9 +218,11 @@ namespace Core.Game
                     ChangeBattleState(BattleState.Win);
                 else
                     ChangeBattleState(BattleState.Lose);
+                //add delay before death animation
+                yield return new WaitForSeconds(0.5f);
                 damageTo.GetController().Death();
                 //wait for death animation finish
-                while (!_playerCharController.AnimationDone())
+                while (!damageTo.GetController().AnimationDone())
                     yield return null;
                 //delay before battle ended
                 yield return new WaitForSeconds(1f);
@@ -265,8 +266,6 @@ namespace Core.Game
         {
             _playerCanDoAction = false;
             float damage = _playerCharacter.GetCurrentAttack();
-            //player gain mana after basic attack
-            _playerCharacter.AddMana(20);
             //player attack animation
             //move player to enemy
             while (Vector2.Distance(_playerCharacter.transform.position,_currentEnemy.transform.position) > 3f)
@@ -278,7 +277,8 @@ namespace Core.Game
             _playerCharController.Attack();
             while (!_playerCharController.AnimationDone())
                 yield return null;
-
+            //player gain mana after basic attack
+            _playerCharacter.AddMana(20);
             //player give damage to enemy
             StartCoroutine(GiveDamage(damage, _currentEnemy));
             //stop the loop if battle ended either win or lose
@@ -333,38 +333,44 @@ namespace Core.Game
             _playerCanDoAction = false;
 
             //player skill animation
-            //set skill cast animation
-            _playerCharController.Attack(skill.skillAttackAnimationIndex);
-            //wait for skill cast animation
-            while (!_playerCharController.AnimationDone())
-                yield return null;
-
             MinigameManager currentMinigame;
+            string minigamePanel;
             //let player play minigame
             if(skill.minigame == SkillMinigame.Sequence)
             {
                 currentMinigame = SequenceMinigameManager.Instance;
-                PanelManager.Instance.OpenPanel("SequenceMinigame");
+                minigamePanel = "SequenceMinigame";
+                PanelManager.Instance.OpenPanel(minigamePanel);
                 SequenceMinigameManager.Instance.StartSequenceMinigame();
             }
             else
             {
                 currentMinigame = MashButtonMinigameManager.Instance;
-                PanelManager.Instance.OpenPanel("MashbuttonMinigame");
+                minigamePanel = "MashbuttonMinigame";
+                PanelManager.Instance.OpenPanel(minigamePanel);
                 MashButtonMinigameManager.Instance.StartMashButtonMinigame();
             }
 
             //wait for minigame ended
-            while (!currentMinigame.MinigameFinish())
+            while (currentMinigame.MinigameFinish())
             {
                 yield return null;
             }
+
+            //close minigame panel
+            PanelManager.Instance.ClosePanel(minigamePanel);
             //if win skill execute
             if (currentMinigame.IsPlayerWin())
             {
+                //set skill cast animation
+                _playerCharController.Attack(skill.skillAttackAnimationIndex);
+                //wait for skill cast animation
+                while (!_playerCharController.AnimationDone())
+                    yield return null;
                 //spawn skill particle system either shoot from player or spawn at enemy
+                _playerCharController.SpawnParticleSkill(skill.skillParticle,skill.shouldShoot,_currentEnemyCharController);
                 //wait until particle reach enemy
-
+                yield return new WaitForSeconds(skill.skillParticle.main.duration);
                 //skill damage
                 bool weakness = _currentEnemy.IsSkillWeakness(skill.skillElement);
                 float damage = _playerCharacter.GetCurrentAttack() + skill.damage;
@@ -374,6 +380,7 @@ namespace Core.Game
                 if (weakness)
                 {
                     damage = damage * 2;
+                    //add skip enemy turn
                 }
                 //check effect
                 if(skill.effect == SkillEffect.Stun)
@@ -401,11 +408,10 @@ namespace Core.Game
                     yield return null;
             }
 
+            //delay for animation let it loop a bit
+            yield return new WaitForSeconds(1f);
             //make player char idle and flip sprite to be starting pos
             _playerCharController.Idle();
-
-            //delay to next turn
-            yield return new WaitForSeconds(0.5f);
             //change turn
             ChangeBattleState(BattleState.EnemyTurn);
             StartCoroutine(EnemyAttack());

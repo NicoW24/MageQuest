@@ -13,6 +13,7 @@ MonoBehaviour:
   m_Name: Ignite
   m_EditorClassIdentifier: Core.Game::Core.Game.CharacterSkillSO
   skillName: Ignite
+  skillDesc: 
   skillElement: 0
   manaCost: 20
   damage: 0
@@ -20,5 +21,6 @@ MonoBehaviour:
   effectTurn: 2
   dotDamage: 15
   minigame: 1
-  skillParticle: {fileID: 0}
-  skillAttackAnimationIndex: 5
+  skillParticle: {fileID: 3845474131018176719, guid: e9022c9828cb92c439b52e52ebf8d9c3, type: 3}
+  skillAttackAnimationIndex: 4
+  shouldShoot: 0

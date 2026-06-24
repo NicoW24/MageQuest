@@ -13,6 +13,7 @@ MonoBehaviour:
   m_Name: Smite
   m_EditorClassIdentifier: Core.Game::Core.Game.CharacterSkillSO
   skillName: Smite
+  skillDesc: 
   skillElement: 2
   manaCost: 20
   damage: 10
@@ -20,5 +21,6 @@ MonoBehaviour:
   effectTurn: 2
   dotDamage: 0
   minigame: 1
-  skillParticle: {fileID: 0}
-  skillAttackAnimationIndex: 5
+  skillParticle: {fileID: 6217632575707019557, guid: e3efb238e600d3c4aaca821f35efee8e, type: 3}
+  skillAttackAnimationIndex: 4
+  shouldShoot: 0

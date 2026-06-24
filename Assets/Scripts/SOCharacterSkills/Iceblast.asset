@@ -13,6 +13,7 @@ MonoBehaviour:
   m_Name: Iceblast
   m_EditorClassIdentifier: Core.Game::Core.Game.CharacterSkillSO
   skillName: Iceblast
+  skillDesc: 
   skillElement: 1
   manaCost: 20
   damage: 0
@@ -20,5 +21,6 @@ MonoBehaviour:
   effectTurn: 2
   dotDamage: 0
   minigame: 0
-  skillParticle: {fileID: 0}
-  skillAttackAnimationIndex: 5
+  skillParticle: {fileID: 6466126389432535038, guid: b63ba4d1aedcb324bb41f72efc2da3f5, type: 3}
+  skillAttackAnimationIndex: 4
+  shouldShoot: 0

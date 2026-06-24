@@ -1,4 +1,5 @@
 using System.Collections.Generic;
+using UI.Game;
 using UnityEngine;
 
 namespace Core.Game
@@ -8,7 +9,6 @@ namespace Core.Game
         [SerializeField] SkillActionButton _skillActionButtonPrefab;
         [SerializeField] Transform _skillActionButtonContent;
         List<SkillActionButton> listSpawnedSkill = new List<SkillActionButton>();
-
         public static PlayerSkillActionPanelManager Instance;
 
         void Awake()
@@ -21,7 +21,7 @@ namespace Core.Game
 
         void OnEnable()
         {
-            
+            CheckAvailableSkill();
         }
 
         void Start()
@@ -32,11 +32,16 @@ namespace Core.Game
             {
                 AddSkill(playerSkill);
             }
+            CheckAvailableSkill();
         }
 
-        void DisableSkillButton()
+        void CheckAvailableSkill()
         {
-            //DISABLE SKILL THAT PLAYER CANT EXECUTE BECAUSE OF MANA
+            //disable skill that can't execute because mana cost
+            foreach(SkillActionButton skillButton in listSpawnedSkill)
+            {
+                skillButton.GetButton().interactable = BattleManager.Instance.GetPlayerStat().GetCurrentMana() >= skillButton.GetSkill().manaCost;
+            }
         }
 
         public void AddSkill(CharacterSkillSO skill)
@@ -44,6 +49,16 @@ namespace Core.Game
             SkillActionButton newSkillButton = Instantiate(_skillActionButtonPrefab, _skillActionButtonContent);
             newSkillButton.SetupSkillActionButton(skill);
             listSpawnedSkill.Add(newSkillButton);
+        }
+
+        public void OpenPanel()
+        {
+            gameObject.SetActive(true);
+        }
+
+        public void ClosePanel()
+        {
+            gameObject.SetActive(false);
         }
     }
 }

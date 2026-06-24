@@ -1,5 +1,6 @@
 using TMPro;
 using UnityEngine;
+using UnityEngine.UI;
 
 namespace Core.Game
 {
@@ -7,10 +8,22 @@ namespace Core.Game
     {
         CharacterSkillSO _skill;
         [SerializeField] TextMeshProUGUI _skillNameText;
+        Button _button;
+
+        void Awake()
+        {
+            _button = GetComponent<Button>();
+            _button.onClick.AddListener(OnClickSkill);
+        }
+
+        public Button GetButton()
+        {
+            return _button;
+        }
 
         public void SetupSkillActionButton(CharacterSkillSO skill)
         {
-            _skillNameText.text = $"{skill.skillName}\nDamage{skill.damage}\nCost{skill.manaCost}";
+            _skillNameText.text = $"{skill.skillName}\n<Size=8>Dmg {skill.damage}/Cost {skill.manaCost}";
             _skill = skill;
         }
 
@@ -22,6 +35,8 @@ namespace Core.Game
         public void OnClickSkill()
         {
             BattleManager.Instance.OnPlayerSkillAction(_skill);
+            //close skill
+            PlayerSkillActionPanelManager.Instance.ClosePanel();
         }
     }
 }

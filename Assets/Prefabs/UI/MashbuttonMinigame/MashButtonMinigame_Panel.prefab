@@ -86,8 +86,9 @@ GameObject:
   - component: {fileID: 4472156687322009422}
   - component: {fileID: 2040428732811208006}
   - component: {fileID: 922375127792622754}
+  - component: {fileID: 1874797255251334030}
   m_Layer: 5
-  m_Name: MashButtonMinigame_Panel
+  m_Name: MashbuttonMinigame_Panel
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -142,6 +143,28 @@ MonoBehaviour:
   _progressSlider: {fileID: 5525801526272140343}
   _timerText: {fileID: 510368822183854944}
   mashKey: 32
+--- !u!95 &1874797255251334030
+Animator:
+  serializedVersion: 7
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1446198202345470689}
+  m_Enabled: 1
+  m_Avatar: {fileID: 0}
+  m_Controller: {fileID: 9100000, guid: cbe26e3093ccf7342b68294a4660fd6a, type: 2}
+  m_CullingMode: 0
+  m_UpdateMode: 0
+  m_ApplyRootMotion: 0
+  m_LinearVelocityBlending: 0
+  m_StabilizeFeet: 0
+  m_AnimatePhysics: 0
+  m_WarningMessage: 
+  m_HasTransformHierarchy: 1
+  m_AllowConstantClipSamplingOptimization: 1
+  m_KeepAnimatorStateOnDisable: 0
+  m_WriteDefaultValuesOnDisable: 0
 --- !u!1 &2702674885382900190
 GameObject:
   m_ObjectHideFlags: 0

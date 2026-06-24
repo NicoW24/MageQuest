@@ -11,7 +11,7 @@ namespace Core.Game
 
         [Header("Minigame Variable Mechanic")]
         public KeyCode mashKey = KeyCode.Space;
-        int _pressNeeded = 50;
+        int _pressNeeded = 30;
 
         int _pressCounter;
 
@@ -27,7 +27,7 @@ namespace Core.Game
         /// <summary>
         /// Start mash button minigame
         /// </summary>
-        public void StartMashButtonMinigame(int pressNeeded = 100, float timeLimit=5)
+        public void StartMashButtonMinigame(int pressNeeded = 20, float timeLimit=5)
         {
             //reset press counter
             _pressCounter = 0;
@@ -37,6 +37,7 @@ namespace Core.Game
 
             _progressSlider.maxValue = _pressNeeded;
             _progressSlider.minValue = 0;
+            _progressSlider.value = 0;
 
             _isPlaying = true;
         }
@@ -50,10 +51,7 @@ namespace Core.Game
             //time limit reached
             if (_timer <= 0)
             {
-                //stop minigame
-                _isPlaying = false;
-                //player lose
-                _playerWin = false;
+                CheckResult();
                 return;
             }
 
@@ -61,8 +59,11 @@ namespace Core.Game
             {
                 _progressSlider.value = _pressCounter;
                 _pressCounter++;
+
+                //if pressneeded done before time limit let player end the minigame
+                if (_pressCounter >= _pressNeeded)
+                    CheckResult();
             }
-            CheckResult();
         }
         /// <summary>
         /// Check result if target reached end minigame and set player win

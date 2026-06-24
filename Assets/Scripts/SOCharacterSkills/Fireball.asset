@@ -13,6 +13,7 @@ MonoBehaviour:
   m_Name: Fireball
   m_EditorClassIdentifier: Core.Game::Core.Game.CharacterSkillSO
   skillName: Fireball
+  skillDesc: 
   skillElement: 0
   manaCost: 10
   damage: 15
@@ -20,5 +21,6 @@ MonoBehaviour:
   effectTurn: 0
   dotDamage: 0
   minigame: 0
-  skillParticle: {fileID: 0}
-  skillAttackAnimationIndex: 5
+  skillParticle: {fileID: 7385381793033806630, guid: 92417cb39bb1a1d49ab41b9084ca01d7, type: 3}
+  skillAttackAnimationIndex: 4
+  shouldShoot: 1

@@ -14,8 +14,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   characterName: Skeleton
   characterElement: 2
-  HP: 30
+  HP: 100
   Def: 0
   Attack: 30
   Mana: 0
-  Speed: 0
