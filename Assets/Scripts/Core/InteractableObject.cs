@@ -20,7 +20,9 @@ namespace Core.Game
         {
             _lootChestObject = GetComponent<LootChestObject>();
         }
-
+        /// <summary>
+        /// Set object to player and show interaction UI
+        /// </summary>
         void OnTriggerEnter2D(Collider2D other)
         {
             if(other.transform.tag == "Player")
@@ -44,6 +46,9 @@ namespace Core.Game
                 PanelManager.Instance.OpenPanel("InteractNotif");
             }
         }
+        /// <summary>
+        /// Function when player exit collider
+        /// </summary>
         void OnTriggerExit2D(Collider2D other)
         {
             if (other.transform.tag == "Player")
@@ -63,7 +68,9 @@ namespace Core.Game
                 PanelManager.Instance.ClosePanel("InteractNotif");
             }
         }
-
+        /// <summary>
+        /// Get chest object
+        /// </summary>
         public LootChestObject GetChestObject()
         {
             return _lootChestObject;

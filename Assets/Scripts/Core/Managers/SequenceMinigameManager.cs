@@ -2,11 +2,10 @@ using System.Collections.Generic;
 using System.Linq;
 using TMPro;
 using UnityEngine;
-using UnityEngine.Events;
 
 namespace Core.Game
 {
-    public class SequenceMinigameManager : MonoBehaviour
+    public class SequenceMinigameManager : MinigameManager
     {
         [SerializeField] TextMeshProUGUI _timerText;
         [SerializeField] Transform _sequenceKeyContainer;
@@ -14,17 +13,12 @@ namespace Core.Game
         List<SequenceMinigameKeyObject> _spawnedSequenceKeyObject = new List<SequenceMinigameKeyObject>();
         [SerializeField] List<Sprite> _listKeySequenceSprite = new List<Sprite>();
 
-        //ramp up difficulty according to skill
+        [Header("Minigame Variable Mechanic")]
         int _sequenceLength = 4;
         float _timeLimit = 5f;
 
         List<KeyCode> _listSequence = new List<KeyCode>();
         int _currentIndex;
-        float _timer;
-        bool _isPlaying;
-
-        public UnityAction OnWinMinigame;
-        public UnityAction OnLoseMinigame;
 
         public static SequenceMinigameManager Instance;
 
@@ -72,6 +66,7 @@ namespace Core.Game
             _currentIndex = 0;
             _timer = timeLimit;
             _isPlaying = true;
+            _playerWin = false;
         }
         void Update()
         {
@@ -80,9 +75,11 @@ namespace Core.Game
 
             _timer -= Time.deltaTime;
             _timerText.text = Mathf.CeilToInt(_timer).ToString();
+            //time limit reached game end
             if (_timer <= 0)
             {
-                MinigameLose();
+                _isPlaying = false;
+                _playerWin = false;
                 return;
             }
 
@@ -196,31 +193,22 @@ namespace Core.Game
                 //correct input
                 _spawnedSequenceKeyObject[_currentIndex].KeyCorrect();
                 _currentIndex++;
+                //check sequence input finished
                 if (_currentIndex >= _listSequence.Count)
                 {
-                    MinigameWin();
+                    //stop minigame
+                    _isPlaying = false;
+                    //player win
+                    _playerWin = true;
                 }
             }
             else
             {
-                MinigameLose();
+                //stop minigame
+                _isPlaying = false;
+                //player lose
+                _playerWin = false;
             }
-        }
-        /// <summary>
-        /// Minigame win function
-        /// </summary>
-        void MinigameWin()
-        {
-            _isPlaying = false;
-            OnWinMinigame?.Invoke();
-        }
-        /// <summary>
-        /// Minigame lose function
-        /// </summary>
-        void MinigameLose()
-        {
-            _isPlaying = false;
-            OnLoseMinigame?.Invoke();
         }
     }
 }

@@ -19,12 +19,14 @@ namespace UI.Game
             _canvas = GetComponentInParent<Canvas>();
             _canvasRect = _canvas.GetComponent<RectTransform>();
         }
-
+        /// <summary>
+        /// Set character to follow
+        /// </summary>
         public void SetFollow(Transform target)
         {
             followTarget = target;
         }
-
+        
         void LateUpdate()
         {
             if (followTarget == null || !gameObject.activeInHierarchy)

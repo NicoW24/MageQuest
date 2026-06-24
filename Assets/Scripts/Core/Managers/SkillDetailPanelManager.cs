@@ -22,16 +22,21 @@ namespace Core.Game
             }
         }
 
+        /// <summary>
+        /// Set skill data to UI
+        /// </summary>
         public void SetData(CharacterSkillSO skill,LootChestObject chest)
         {
             _skillNameText.text = skill.skillName;
             _skillDescText.text = skill.skillDesc;
-            _skillDamageText.text = $"Damage:/n{skill.damage}";
-            _skillManaCostText.text = $"Mana Cost:/n{skill.manaCost}";
+            _skillDamageText.text = $"Damage:\n{skill.damage}";
+            _skillManaCostText.text = $"Mana Cost:\n{skill.manaCost}";
 
             _currentChest = chest;
         }
-
+        /// <summary>
+        /// Let player close chest after closing the detail panel
+        /// </summary>
         public void CloseChest()
         {
             _currentChest.CloseChest();

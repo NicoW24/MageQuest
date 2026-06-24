@@ -96,6 +96,7 @@ namespace Core.Game
         {
             //set turn count
             currentTurn = 0;
+            _playerCanDoAction = true;
 
             _currentCharactersInBattle.Clear();
             _currentEnemy = _enemyCharacter;
@@ -247,6 +248,9 @@ namespace Core.Game
                     break;
             }
         }
+        /// <summary>
+        /// Function after player press a skill
+        /// </summary>
         public void OnPlayerSkillAction(CharacterSkillSO skill)
         {
             if (_currentBattleState != BattleState.PlayerTurn || !_playerCanDoAction)
@@ -261,7 +265,8 @@ namespace Core.Game
         {
             _playerCanDoAction = false;
             float damage = _playerCharacter.GetCurrentAttack();
-
+            //player gain mana after basic attack
+            _playerCharacter.AddMana(20);
             //player attack animation
             //move player to enemy
             while (Vector2.Distance(_playerCharacter.transform.position,_currentEnemy.transform.position) > 3f)
@@ -320,30 +325,81 @@ namespace Core.Game
             ChangeBattleState(BattleState.EnemyTurn);
             StartCoroutine(EnemyAttack());
         }
+        /// <summary>
+        /// Coroutine for player skill turn
+        /// </summary>
         IEnumerator PlayerSkill(CharacterSkillSO skill)
         {
             _playerCanDoAction = false;
 
             //player skill animation
             //set skill cast animation
-            _playerCharController.Attack(5);
+            _playerCharController.Attack(skill.skillAttackAnimationIndex);
             //wait for skill cast animation
             while (!_playerCharController.AnimationDone())
                 yield return null;
+
+            MinigameManager currentMinigame;
             //let player play minigame
             if(skill.minigame == SkillMinigame.Sequence)
             {
+                currentMinigame = SequenceMinigameManager.Instance;
                 PanelManager.Instance.OpenPanel("SequenceMinigame");
+                SequenceMinigameManager.Instance.StartSequenceMinigame();
             }
             else
             {
+                currentMinigame = MashButtonMinigameManager.Instance;
                 PanelManager.Instance.OpenPanel("MashbuttonMinigame");
+                MashButtonMinigameManager.Instance.StartMashButtonMinigame();
             }
 
             //wait for minigame ended
+            while (!currentMinigame.MinigameFinish())
+            {
+                yield return null;
+            }
             //if win skill execute
-            //spawn skill particle system either shoot from player or spawn at enemy
-            //if lose skill not executed
+            if (currentMinigame.IsPlayerWin())
+            {
+                //spawn skill particle system either shoot from player or spawn at enemy
+                //wait until particle reach enemy
+
+                //skill damage
+                bool weakness = _currentEnemy.IsSkillWeakness(skill.skillElement);
+                float damage = _playerCharacter.GetCurrentAttack() + skill.damage;
+                //mana cost
+                _playerCharacter.DecreaseMana(skill.manaCost);
+                //if skill weakness of enemy add more damage
+                if (weakness)
+                {
+                    damage = damage * 2;
+                }
+                //check effect
+                if(skill.effect == SkillEffect.Stun)
+                {
+                    //make enemy skip turn according to effect turn 
+                }
+                else if(skill.effect == SkillEffect.DOT)
+                {
+                    //make enemy take dot damage according to effect turn 
+                }
+
+                //player give damage to enemy
+                StartCoroutine(GiveDamage(damage, _currentEnemy));
+                //stop the loop if battle ended either win or lose
+                if (IsBattleEnded())
+                    yield break;
+            }
+            //else lose skill not executed and player skipped turn
+            else
+            {
+                //play animation
+                _playerCharController.Stun();
+                //wait for animation finished
+                while (!_playerCharController.AnimationDone())
+                    yield return null;
+            }
 
             //make player char idle and flip sprite to be starting pos
             _playerCharController.Idle();

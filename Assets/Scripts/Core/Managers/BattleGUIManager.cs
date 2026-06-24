@@ -10,6 +10,7 @@ namespace Core.Game
     public class BattleGUIManager : MonoBehaviour
     {
         [SerializeField] Slider _PlayerHPBar;
+        [SerializeField] Slider _PlayerManaBar;
         [SerializeField] Slider _EnemyHPBar;
         [SerializeField] TextMeshProUGUI _turnText;
         CharacterStat _player, _enemy;
@@ -33,6 +34,7 @@ namespace Core.Game
 
             _PlayerHPBar.maxValue = _player.GetMaxHP();
             _EnemyHPBar.maxValue = _enemy.GetMaxHP();
+            _PlayerManaBar.maxValue = _player.GetMaxMana();
 
             //activate hp bar follow
             HPBarFollowCharacter hpBarFollowPlayer = _PlayerHPBar.GetComponent<HPBarFollowCharacter>();
@@ -41,6 +43,7 @@ namespace Core.Game
             hpBarFollowEnemy.SetFollow(enemy.transform);
 
             UpdateHPUI();
+            UpdateManaUI();
         }
         /// <summary>
         /// Update turn text
@@ -52,29 +55,37 @@ namespace Core.Game
         /// <summary>
         /// Update HP slider according to current data
         /// </summary>
-        Coroutine _playerHpRoutine;
-        Coroutine _enemyHpRoutine;
+        Coroutine _playerHPRoutine;
+        Coroutine _enemyHPRoutine;
         public void UpdateHPUI()
         {
-            if (_playerHpRoutine != null)
-                StopCoroutine(_playerHpRoutine);
+            if (_playerHPRoutine != null)
+                StopCoroutine(_playerHPRoutine);
 
-            if (_enemyHpRoutine != null)
-                StopCoroutine(_enemyHpRoutine);
+            if (_enemyHPRoutine != null)
+                StopCoroutine(_enemyHPRoutine);
 
-            _playerHpRoutine = StartCoroutine(AnimateHPBar(_player.GetCurrentHP(), _PlayerHPBar));
+            _playerHPRoutine = StartCoroutine(AnimateSliderBar(_player.GetCurrentHP(), _PlayerHPBar));
 
-            _enemyHpRoutine = StartCoroutine(AnimateHPBar(_enemy.GetCurrentHP(), _EnemyHPBar));
+            _enemyHPRoutine = StartCoroutine(AnimateSliderBar(_enemy.GetCurrentHP(), _EnemyHPBar));
+        }
+        Coroutine _playerManaRoutine;
+        public void UpdateManaUI()
+        {
+            if (_playerManaRoutine != null)
+                StopCoroutine(_playerManaRoutine);
+
+            _playerManaRoutine = StartCoroutine(AnimateSliderBar(_player.GetCurrentMana(), _PlayerManaBar));
         }
         /// <summary>
-        /// Animate HP Bar
+        /// Animate slider bar
         /// </summary>
-        IEnumerator AnimateHPBar(float targetValue, Slider hpSlider)
+        IEnumerator AnimateSliderBar(float targetValue, Slider slider)
         {
-            while (Mathf.Abs(hpSlider.value - targetValue) > 0.01f)
+            while (Mathf.Abs(slider.value - targetValue) > 0.01f)
             {
-                hpSlider.value = Mathf.Lerp(
-                    hpSlider.value,
+                slider.value = Mathf.Lerp(
+                    slider.value,
                     targetValue,
                     Time.deltaTime * 5f
                 );
@@ -82,18 +93,27 @@ namespace Core.Game
                 yield return null;
             }
 
-            hpSlider.value = targetValue;
+            slider.value = targetValue;
         }
 
         #region Player Action
+        /// <summary>
+        /// On click attack button
+        /// </summary>
         public void PlayerAttack()
         {
             BattleManager.Instance.OnPlayerAction(0);
         }
+        /// <summary>
+        /// On click defend button
+        /// </summary>
         public void PlayerDefend()
         {
             BattleManager.Instance.OnPlayerAction(1);
         }
+        /// <summary>
+        /// On click skill button
+        /// </summary>
         public void PlayerSkill()
         {
             //show skill selection UI (NOT DONE)

@@ -154,6 +154,13 @@ namespace Core.Game
             PlayStateAnimation(PlayerState.DAMAGED, 0);
         }
         /// <summary>
+        /// Character take stun function
+        /// </summary>
+        public virtual void Stun()
+        {
+            PlayStateAnimation(PlayerState.DEBUFF, 0);
+        }
+        /// <summary>
         /// Character dead function
         /// </summary>
         public virtual void Death()

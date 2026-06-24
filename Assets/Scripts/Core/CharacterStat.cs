@@ -51,14 +51,14 @@ namespace Core.Game
         /// </summary>
         public bool IsSkillWeakness(Elements skillElement)
         {
-            switch (skillElement)
+            switch (_currentElement)
             {
                 case Elements.Fire:
-                    return _currentElement == Elements.Ice;
+                    return skillElement == Elements.Ice;
                 case Elements.Ice:
-                    return _currentElement == Elements.Nature;
+                    return skillElement == Elements.Nature;
                 case Elements.Nature:
-                    return _currentElement == Elements.Fire;
+                    return skillElement == Elements.Fire;
             }
             return false;
         }
@@ -82,6 +82,22 @@ namespace Core.Game
                 isDead = true;
             }
         }
+        /// <summary>
+        /// Skill use mana
+        /// </summary>
+        public void DecreaseMana(float value)
+        {
+            _currentMana = _currentMana - value;
+            BattleGUIManager.Instance.UpdateManaUI();
+        }
+        /// <summary>
+        /// Basic attack add mana
+        /// </summary>
+        public void AddMana(float value)
+        {
+            _currentMana = _currentMana + value;
+            BattleGUIManager.Instance.UpdateManaUI();
+        }
         public float GetMaxHP()
         {
             return characterDetailSO.HP;
@@ -89,6 +105,10 @@ namespace Core.Game
         public float GetCurrentHP()
         {
             return _currentHP;
+        }
+        public float GetMaxMana()
+        {
+            return characterDetailSO.Mana;
         }
         public float GetCurrentMana()
         {
@@ -123,6 +143,8 @@ namespace Core.Game
         public void AddSkill(CharacterSkillSO skill)
         {
             listOwnedSkill.Add(skill);
+            //add skill to panel
+            PlayerSkillActionPanelManager.Instance.AddSkill(skill);
         }
     }
 }

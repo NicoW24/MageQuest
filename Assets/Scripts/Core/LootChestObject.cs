@@ -16,6 +16,9 @@ namespace Core.Game
             _animator = GetComponent<Animator>();
         }
 
+        /// <summary>
+        /// Move and activate chest to dead enemy pos
+        /// </summary>
         public void SetupChest(Vector2 pos)
         {
             CloseChest();
@@ -26,7 +29,9 @@ namespace Core.Game
             transform.position = new Vector2(pos.x,transform.position.y);
             hasLoot = true;
         }
-
+        /// <summary>
+        /// Open chest animation and randomize unlearned skill
+        /// </summary>
         public void OpenChest()
         {
             if (!hasLoot)
@@ -48,13 +53,17 @@ namespace Core.Game
 
             hasLoot = false;
         }
-
+        /// <summary>
+        /// Hide chest after loot taken
+        /// </summary>
         public void HideChest()
         {
             //hide chest
             gameObject.SetActive(false);
         }
-
+        /// <summary>
+        /// Close chest animation
+        /// </summary>
         public void CloseChest()
         {
             _animator.SetBool("Open", false);
