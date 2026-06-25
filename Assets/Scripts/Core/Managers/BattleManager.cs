@@ -123,6 +123,9 @@ namespace Core.Game
         /// </summary>
         public void StartBattle(CharacterStat _enemyCharacter,bool enemyInitiate = false)
         {
+            //reset player stat on new battle
+            _playerCharacter.SetupCharacter();
+
             //reset variable
             _currentCharacterStunned = false;
             _currentCharacterDOT = false;
