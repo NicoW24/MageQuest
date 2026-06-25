@@ -46,7 +46,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   _currentBattleState: 0
   _currentCharactersInBattle: []
-  listAllCharacterSkill:
+  _listAllCharacterSkill:
   - {fileID: 11400000, guid: e270a09bc27bd004db16d3d4629f5773, type: 2}
   - {fileID: 11400000, guid: 571df3a03a820654aaf8669d61ebf1ad, type: 2}
   - {fileID: 11400000, guid: 91a511dc46acd6847a384a771c802abb, type: 2}

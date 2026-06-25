@@ -13,26 +13,33 @@ public enum BattleState
     Lose
 }
 
+public enum PlayerAction
+{
+    Attack,
+    Defend,
+    Skill
+}
+
 namespace Core.Game
 {
     public class BattleManager : MonoBehaviour
     {
-        int currentTurn = 0;
         [SerializeField] BattleState _currentBattleState;
         bool _playerCanDoAction = true;//prevent player spamming action
         [SerializeField] List<CharacterStat> _currentCharactersInBattle=new List<CharacterStat>();
-        public List<CharacterSkillSO> listAllCharacterSkill = new List<CharacterSkillSO>();
+        [SerializeField] List<CharacterSkillSO> _listAllCharacterSkill = new List<CharacterSkillSO>();
+        public IReadOnlyList<CharacterSkillSO> ListAllCharacterSkill => _listAllCharacterSkill;
 
         [SerializeField] CharacterStat _playerCharacter;
         CharacterController _playerCharController;
-        Vector3 _playerStartBattlePos;
         [SerializeField] CharacterStat _currentEnemy;
         CharacterController _currentEnemyCharController;
-        Vector3 _EnemyStartBattlePos;
 
         [SerializeField] LootChestObject _lootChestObject;
 
         bool _playerDefend = false;
+        bool _currentCharacterStunned = false;
+        bool _currentCharacterDOT = false;
 
         public UnityAction OnBattleStarted;
         public UnityAction OnBattleEnded;
@@ -59,6 +66,19 @@ namespace Core.Game
             //disable chest object
             _lootChestObject.HideChest();
         }
+        void OnDestroy()
+        {
+            if (PanelManager.Instance != null)
+            {
+                var panel = PanelManager.Instance.GetPanel("GameOverSplashscreen");
+                if (panel != null)
+                {
+                    panel.GetComponent<GameOverPanel>().OnPlayAgain -= PlayAgain;
+                }
+            }
+        }
+
+        #region Helper
         /// <summary>
         /// Function to get player character object
         /// </summary>
@@ -81,21 +101,31 @@ namespace Core.Game
             return _currentBattleState.ToString();
         }
         /// <summary>
+        /// Check if battle ended to stop coroutine
+        /// </summary>
+        bool IsBattleEnded()
+        {
+            return _currentBattleState == BattleState.Lose || _currentBattleState == BattleState.Win;
+        }
+        #endregion
+
+        #region Battle State Function
+        /// <summary>
         /// Change battle state
         /// </summary>
         public void ChangeBattleState(BattleState state)
         {
             _currentBattleState = state;
             BattleGUIManager.Instance.UpdateTurnUI();
-            currentTurn++;
         }
         /// <summary>
         /// Function start battle
         /// </summary>
         public void StartBattle(CharacterStat _enemyCharacter,bool enemyInitiate = false)
         {
-            //set turn count
-            currentTurn = 0;
+            //reset variable
+            _currentCharacterStunned = false;
+            _currentCharacterDOT = false;
             _playerCanDoAction = true;
 
             _currentCharactersInBattle.Clear();
@@ -125,6 +155,7 @@ namespace Core.Game
 
             //open battle splashscreen, its automatically close after animation
             PanelManager.Instance.OpenPanel("BattleSplashscreen");
+
             //add event setup battle after animation end
             PanelManager.Instance.OnPanelAnimationComplete += SetupBattle;
         }
@@ -135,16 +166,9 @@ namespace Core.Game
         {
             //remove event
             PanelManager.Instance.OnPanelAnimationComplete -= SetupBattle;
+
             //open battle gui panel
             PanelManager.Instance.OpenPanel("BattleGUI");
-
-            //move enemy character to battle position
-            Vector3 attackPos = _playerCharacter.transform.position + Vector3.right * 10f;
-            _currentEnemy.transform.position = attackPos;
-
-            //set battle start position foreach char
-            _EnemyStartBattlePos = _currentEnemyCharController.transform.position;
-            _playerStartBattlePos = _playerCharController.transform.position;
 
             //setup battle GUI
             BattleGUIManager.Instance.SetupBattleGUI(_playerCharacter,_currentEnemy);
@@ -186,16 +210,10 @@ namespace Core.Game
                 _lootChestObject.SetupChest(_currentEnemy.transform.position);
             }
         }
+        #endregion
 
         #region Battle System
-        /// <summary>
-        /// Check if battle ended to stop coroutine
-        /// </summary>
-        /// <returns></returns>
-        bool IsBattleEnded()
-        {
-            return _currentBattleState == BattleState.Lose|| _currentBattleState == BattleState.Win;
-        }
+        #region Damage System
         /// <summary>
         /// Give damage to character function
         /// </summary>
@@ -211,6 +229,7 @@ namespace Core.Game
             //stop player defend after taken damage, if player is defending
             if (_playerDefend)
                 _playerDefend = false;
+
             //check win condition
             if (damageTo.GetCurrentHP() <= 0)
             {
@@ -230,21 +249,98 @@ namespace Core.Game
                 yield break;
             }
         }
+        /// <summary>
+        /// Take dot status effect damage
+        /// </summary>
+        IEnumerator TakeDOTDamage(CharacterStat currentChar)
+        {
+            //floating text dot
+            FloatingTextManager.Instance.ShowFloatingText("Burn", FloatingTextType.Damage, currentChar.transform);
+            float dotDamage = 0;
+            float skillDamage = 0;
+            foreach (CharacterSkillSO dotSkill in currentChar.GetAllDOTSkillEffect())
+            {
+                //if weakness
+                if (currentChar.IsSkillWeakness(dotSkill.skillElement))
+                {
+                    skillDamage = dotSkill.dotDamage * 2;
+                    FloatingTextManager.Instance.ShowFloatingText("Weakness", FloatingTextType.Damage, currentChar.transform);
+                }
+                else
+                {
+                    skillDamage = dotSkill.dotDamage;
+                }
+                dotDamage += skillDamage;
+            }
+            yield return StartCoroutine(GiveDamage(dotDamage, currentChar));
+        }
+        #endregion
+        #region Status Effect System
+        /// <summary>
+        /// Check active status effect on character
+        /// </summary>
+        void CheckActiveStatusEffectOnCharacter(CharacterStat currentCharacter)
+        {
+            _currentCharacterStunned = false;
+            _currentCharacterDOT = false;
+            //check status effect
+            if (currentCharacter.GetStatusEffectDuration().Count > 0)
+            {
+                //check for stun
+                if (currentCharacter.GetStatusEffectDuration(StatusEffect.Stun) > 0)
+                {
+                    _currentCharacterStunned = true;
+                }
+                //check for dot
+                if (currentCharacter.GetStatusEffectDuration(StatusEffect.DOT) > 0)
+                {
+                    _currentCharacterDOT = true;
+                }
+            }
+        }
+        #endregion
+        /// <summary>
+        /// Coroutine for character attack
+        /// </summary>
+        IEnumerator CharacterAttackSequence(CharacterStat _currentCharacter, CharacterStat Target)
+        {
+            float damage = _currentCharacter.GetCurrentAttack();
+            //character attack animation
+            //start attack sequence
+            yield return StartCoroutine(_currentCharacter.GetController().PlayMeleeAttackSequence(Target.transform.position));
+
+            //player can charge mana from basic attack
+            if(_currentCharacter == _playerCharacter)
+            {
+                _currentCharacter.AddManaFromBasicAttack();
+            }
+
+            //character give damage to target
+            yield return StartCoroutine(GiveDamage(damage, Target));
+            //stop the loop if battle ended either win or lose
+            if (IsBattleEnded())
+                yield break;
+
+            //add delay after giving damage
+            yield return new WaitForSeconds(1.2f);
+            //move character to starting pos
+            yield return StartCoroutine(_currentCharacter.GetController().ReturnToStartingBattlePosition());
+        }
         #region Player Turn
         /// <summary>
         /// Function after player press action button
         /// </summary>
-        public void OnPlayerAction(float actionCode)//0 attack 1 defend 2 skill
+        public void OnPlayerAction(PlayerAction playerAction)
         {
             if(_currentBattleState != BattleState.PlayerTurn || !_playerCanDoAction)
                 return;
 
-            switch (actionCode)
+            switch (playerAction)
             {
-                case 0:
+                case PlayerAction.Attack:
                     StartCoroutine(PlayerAttack());
                     break;
-                case 1:
+                case PlayerAction.Defend:
                     StartCoroutine(PlayerDefend());
                     break;
             }
@@ -265,42 +361,45 @@ namespace Core.Game
         IEnumerator PlayerAttack()
         {
             _playerCanDoAction = false;
-            float damage = _playerCharacter.GetCurrentAttack();
-            //player attack animation
-            //move player to enemy
-            while (Vector2.Distance(_playerCharacter.transform.position,_currentEnemy.transform.position) > 3f)
-            {
-                _playerCharController.MoveTowards(_currentEnemy.transform.position, 5f);
-                yield return null;
-            }
-            //set attack animation
-            _playerCharController.Attack();
-            while (!_playerCharController.AnimationDone())
-                yield return null;
-            //player gain mana after basic attack
-            _playerCharacter.AddMana(20);
-            //player give damage to enemy
-            StartCoroutine(GiveDamage(damage, _currentEnemy));
-            //stop the loop if battle ended either win or lose
-            if (IsBattleEnded())
-                yield break;
 
-            //add delay after giving damage
-            yield return new WaitForSeconds(1.2f);
-            //move player to starting pos
-            while (Vector2.Distance(_playerCharacter.transform.position, _playerStartBattlePos) > 0f)
+            //check status effect
+            CheckActiveStatusEffectOnCharacter(_playerCharacter);
+            //if stunned skip attack
+            if (!_currentCharacterStunned)
             {
-                _playerCharController.MoveTowards(_playerStartBattlePos, 5f);
-                yield return null;
+                #region Attack
+                yield return StartCoroutine(CharacterAttackSequence(_playerCharacter, _currentEnemy));
+                #endregion
             }
+            else
+            {
+                _playerCharController.Stun();
+                //wait for animation finished
+                while (!_playerCharController.AnimationDone())
+                    yield return null;
+                //delay
+                yield return new WaitForSeconds(0.5f);
+            }
+
+            //check dot
+            if (_currentCharacterDOT)
+            {
+                yield return StartCoroutine(TakeDOTDamage(_playerCharacter));
+                //stop the loop if battle ended either win or lose
+                if (IsBattleEnded())
+                    yield break;
+            }
+
+            //decrease status effect if affected
+            _playerCharacter.DecreaseStatusEffectDuration();
+
             //make player char idle and flip sprite to be starting pos
             _playerCharController.Idle();
-
             //delay to next turn
             yield return new WaitForSeconds(0.5f);
             //change turn
             ChangeBattleState(BattleState.EnemyTurn);
-            StartCoroutine(EnemyAttack());
+            yield return StartCoroutine(EnemyAttack());
         }
         /// <summary>
         /// Coroutine for player defend turn
@@ -309,21 +408,49 @@ namespace Core.Game
         {
             _playerCanDoAction = false;
 
-            //player defend animation
-            //set defend animation
-            _playerCharController.Defend();
-            //enable player defend
-            _playerDefend = true;
-            while (!_playerCharController.AnimationDone())
-                yield return null;
+            //check status effect
+            CheckActiveStatusEffectOnCharacter(_playerCharacter);
+            //if stunned skip defend
+            if (!_currentCharacterStunned)
+            {
+                //player defend animation
+                //set defend animation
+                _playerCharController.Defend();
+                //enable player defend
+                _playerDefend = true;
+                while (!_playerCharController.AnimationDone())
+                    yield return null;
+            }
+            else
+            {
+                _playerCharController.Stun();
+                //wait for animation finished
+                while (!_playerCharController.AnimationDone())
+                    yield return null;
+                //delay
+                yield return new WaitForSeconds(0.5f);
+            }
+
+
+            //check dot
+            if (_currentCharacterDOT)
+            {
+                yield return StartCoroutine(TakeDOTDamage(_playerCharacter));
+                //stop the loop if battle ended either win or lose
+                if (IsBattleEnded())
+                    yield break;
+            }
+
+            //decrease status effect if affected
+            _playerCharacter.DecreaseStatusEffectDuration();
+
             //make player char idle and flip sprite to be starting pos
             _playerCharController.Idle();
-
             //delay to next turn
             yield return new WaitForSeconds(0.5f);
             //change turn
             ChangeBattleState(BattleState.EnemyTurn);
-            StartCoroutine(EnemyAttack());
+            yield return StartCoroutine(EnemyAttack());
         }
         /// <summary>
         /// Coroutine for player skill turn
@@ -332,89 +459,111 @@ namespace Core.Game
         {
             _playerCanDoAction = false;
 
-            //player skill animation
-            MinigameManager currentMinigame;
-            string minigamePanel;
-            //let player play minigame
-            if(skill.minigame == SkillMinigame.Sequence)
+            //check status effect
+            CheckActiveStatusEffectOnCharacter(_playerCharacter);
+            //if stunned skip defend
+            if (!_currentCharacterStunned)
             {
-                currentMinigame = SequenceMinigameManager.Instance;
-                minigamePanel = "SequenceMinigame";
-                PanelManager.Instance.OpenPanel(minigamePanel);
-                SequenceMinigameManager.Instance.StartSequenceMinigame();
+                //player skill animation
+                MinigameManager currentMinigame;
+                string minigamePanel;
+                //let player play minigame
+                if (skill.minigame == SkillMinigame.Sequence)
+                {
+                    currentMinigame = SequenceMinigameManager.Instance;
+                    minigamePanel = "SequenceMinigame";
+                    PanelManager.Instance.OpenPanel(minigamePanel);
+                    SequenceMinigameManager.Instance.StartSequenceMinigame();
+                }
+                else
+                {
+                    currentMinigame = MashButtonMinigameManager.Instance;
+                    minigamePanel = "MashbuttonMinigame";
+                    PanelManager.Instance.OpenPanel(minigamePanel);
+                    MashButtonMinigameManager.Instance.StartMashButtonMinigame();
+                }
+
+                //wait for minigame ended
+                while (currentMinigame.StillPlaying())
+                {
+                    yield return null;
+                }
+
+                //close minigame panel
+                PanelManager.Instance.ClosePanel(minigamePanel);
+                //if win skill execute
+                if (currentMinigame.IsPlayerWin())
+                {
+                    //set skill cast animation
+                    _playerCharController.Attack(skill.skillAttackAnimationIndex);
+                    //wait for skill cast animation
+                    while (!_playerCharController.AnimationDone())
+                        yield return null;
+                    //spawn skill particle system either shoot from player or spawn at enemy
+                    _playerCharController.SpawnParticleSkill(skill.skillParticle, skill.shouldShoot, _currentEnemyCharController);
+                    //wait until particle reach enemy
+                    yield return new WaitForSeconds(skill.skillParticle.main.duration);
+                    //skill damage
+                    bool weakness = _currentEnemy.IsSkillWeakness(skill.skillElement);
+                    float damage = _playerCharacter.GetCurrentAttack() + skill.damage;
+                    //mana cost
+                    _playerCharacter.DecreaseMana(skill.manaCost);
+                    //if skill weakness of enemy add more damage
+                    if (weakness)
+                    {
+                        damage = damage * 2;
+                        FloatingTextManager.Instance.ShowFloatingText("Weakness", FloatingTextType.Damage, _currentEnemy.transform);
+                    }
+                    //add status effect if available
+                    if (skill.effect != StatusEffect.None)
+                        _currentEnemy.AddStatusEffect(skill, skill.effectTurn);
+
+                    //player give damage to enemy
+                    yield return StartCoroutine(GiveDamage(damage, _currentEnemy));
+                    //stop the loop if battle ended either win or lose
+                    if (IsBattleEnded())
+                        yield break;
+                }
+                //else lose skill not executed and player skipped turn
+                else
+                {
+                    //play animation
+                    _playerCharController.Stun();
+                    //wait for animation finished
+                    while (!_playerCharController.AnimationDone())
+                        yield return null;
+                }
+                //delay for animation let it loop a bit
+                yield return new WaitForSeconds(0.5f);
             }
             else
             {
-                currentMinigame = MashButtonMinigameManager.Instance;
-                minigamePanel = "MashbuttonMinigame";
-                PanelManager.Instance.OpenPanel(minigamePanel);
-                MashButtonMinigameManager.Instance.StartMashButtonMinigame();
-            }
-
-            //wait for minigame ended
-            while (currentMinigame.MinigameFinish())
-            {
-                yield return null;
-            }
-
-            //close minigame panel
-            PanelManager.Instance.ClosePanel(minigamePanel);
-            //if win skill execute
-            if (currentMinigame.IsPlayerWin())
-            {
-                //set skill cast animation
-                _playerCharController.Attack(skill.skillAttackAnimationIndex);
-                //wait for skill cast animation
-                while (!_playerCharController.AnimationDone())
+                _currentEnemyCharController.Stun();
+                //wait for animation finished
+                while (!_currentEnemyCharController.AnimationDone())
                     yield return null;
-                //spawn skill particle system either shoot from player or spawn at enemy
-                _playerCharController.SpawnParticleSkill(skill.skillParticle,skill.shouldShoot,_currentEnemyCharController);
-                //wait until particle reach enemy
-                yield return new WaitForSeconds(skill.skillParticle.main.duration);
-                //skill damage
-                bool weakness = _currentEnemy.IsSkillWeakness(skill.skillElement);
-                float damage = _playerCharacter.GetCurrentAttack() + skill.damage;
-                //mana cost
-                _playerCharacter.DecreaseMana(skill.manaCost);
-                //if skill weakness of enemy add more damage
-                if (weakness)
-                {
-                    damage = damage * 2;
-                    //add skip enemy turn
-                }
-                //check effect
-                if(skill.effect == SkillEffect.Stun)
-                {
-                    //make enemy skip turn according to effect turn 
-                }
-                else if(skill.effect == SkillEffect.DOT)
-                {
-                    //make enemy take dot damage according to effect turn 
-                }
+                //delay
+                yield return new WaitForSeconds(0.5f);
+            }
 
-                //player give damage to enemy
-                StartCoroutine(GiveDamage(damage, _currentEnemy));
+
+            //check dot
+            if (_currentCharacterDOT)
+            {
+                yield return StartCoroutine(TakeDOTDamage(_playerCharacter));
                 //stop the loop if battle ended either win or lose
                 if (IsBattleEnded())
                     yield break;
             }
-            //else lose skill not executed and player skipped turn
-            else
-            {
-                //play animation
-                _playerCharController.Stun();
-                //wait for animation finished
-                while (!_playerCharController.AnimationDone())
-                    yield return null;
-            }
 
-            //delay for animation let it loop a bit
-            yield return new WaitForSeconds(1f);
+            //decrease status effect if affected
+            _playerCharacter.DecreaseStatusEffectDuration();
+
             //make player char idle and flip sprite to be starting pos
             _playerCharController.Idle();
             //change turn
             ChangeBattleState(BattleState.EnemyTurn);
-            StartCoroutine(EnemyAttack());
+            yield return StartCoroutine(EnemyAttack());
         }
         #endregion
         #region Enemy Turn
@@ -425,38 +574,43 @@ namespace Core.Game
         {
             //delay
             yield return new WaitForSeconds(0.5f);
-            float damage = _currentEnemy.GetCurrentAttack();
-            #region Basic Attack
-            //enemy attack animation
-            //wait for enemy reach player
-            while (Vector2.Distance(_currentEnemy.transform.position, _playerCharacter.transform.position) > 3f)
-            {
-                _currentEnemyCharController.MoveTowards(_playerCharacter.transform.position, 5f);
-                yield return null;
-            }
-            //set attack animation
-            _currentEnemyCharController.Attack();
-            while (!_currentEnemyCharController.AnimationDone())
-                yield return null;
 
-            //enemy give damage to player
-            StartCoroutine(GiveDamage(damage, _playerCharacter));
-            //stop the loop if battle ended either win or lose
-            if (IsBattleEnded())
-                yield break;
+            //check status effect
+            CheckActiveStatusEffectOnCharacter(_currentEnemy);
 
-            //add delay after giving damage
-            yield return new WaitForSeconds(1.2f);
-            //wait for enemy reach starting pos
-            while (Vector2.Distance(_currentEnemy.transform.position, _EnemyStartBattlePos) > 0f)
+            if (!_currentCharacterStunned)
             {
-                _currentEnemyCharController.MoveTowards(_EnemyStartBattlePos, 5f);
-                yield return null;
+                #region Attack
+                yield return StartCoroutine(CharacterAttackSequence(_currentEnemy,_playerCharacter));
+                //stop the loop if battle ended either win or lose
+                if (IsBattleEnded())
+                    yield break;
+                #endregion
             }
+            else
+            {
+                _currentEnemyCharController.Stun();
+                //wait for animation finished
+                while (!_currentEnemyCharController.AnimationDone())
+                    yield return null;
+                //delay
+                yield return new WaitForSeconds(0.5f);
+            }
+
+            //check dot
+            if (_currentCharacterDOT)
+            {
+                yield return StartCoroutine(TakeDOTDamage(_currentEnemy));
+                //stop the loop if battle ended either win or lose
+                if (IsBattleEnded())
+                    yield break;
+            }
+
+            //decrease status effect if affected
+            _currentEnemy.DecreaseStatusEffectDuration();
+
             //make enemy char idle and flip sprite to be starting pos
             _currentEnemyCharController.Idle();
-            #endregion
-
             //change turn
             ChangeBattleState(BattleState.PlayerTurn);
             BattleGUIManager.Instance.UpdateTurnUI();

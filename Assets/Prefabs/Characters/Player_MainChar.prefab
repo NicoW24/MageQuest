@@ -54,7 +54,8 @@ MonoBehaviour:
   _currentDef: 0
   _currentAttack: 0
   _currentMana: 0
-  listOwnedSkill: []
+  _listOwnedSkill:
+  - {fileID: 11400000, guid: e270a09bc27bd004db16d3d4629f5773, type: 2}
   isDead: 0
 --- !u!114 &6960397765709536460
 MonoBehaviour:

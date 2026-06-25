@@ -18,7 +18,7 @@ namespace Core.Game
         /// <summary>
         /// Get minigame state
         /// </summary>
-        public bool MinigameFinish()
+        public bool StillPlaying()
         {
             return _isPlaying;
         }

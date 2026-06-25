@@ -1,5 +1,8 @@
+using System;
 using System.Collections;
 using System.Collections.Generic;
+using System.Linq;
+using UI.Game;
 using UnityEngine;
 
 namespace Core.Game
@@ -19,7 +22,10 @@ namespace Core.Game
         [SerializeField] float _currentMana;
         Elements _currentElement;
 
-        public List<CharacterSkillSO> listOwnedSkill = new List<CharacterSkillSO>();
+        Dictionary<CharacterSkillSO,int> _currentActiveStatusEffectWithDuration = new Dictionary<CharacterSkillSO, int>();//current character active status effect and its duration
+
+        [SerializeField] List<CharacterSkillSO> _listOwnedSkill = new List<CharacterSkillSO>();
+        public IReadOnlyList<CharacterSkillSO> listOwnedSkill => _listOwnedSkill;
 
         public bool isDead = false;
 
@@ -38,7 +44,72 @@ namespace Core.Game
             //reset stat
             BattleManager.Instance.OnPlayAgain += SetupCharacter;
         }
+        /// <summary>
+        /// Get current active status effect dictionary that contains its duration
+        /// </summary>
+        public Dictionary<CharacterSkillSO,int> GetStatusEffectDuration()
+        {
+            return _currentActiveStatusEffectWithDuration;
+        }
+        /// <summary>
+        /// Get current active status effect duration
+        /// </summary>
+        public int GetStatusEffectDuration(StatusEffect effect)
+        {
+            var statusEffect = _currentActiveStatusEffectWithDuration.Keys.Where(x=>x.effect == effect).FirstOrDefault();
+            if(statusEffect == null)
+            {
+                return 0;
+            }
+            return _currentActiveStatusEffectWithDuration[statusEffect];
+        }
+        /// <summary>
+        /// Get all active DOT
+        /// </summary>
+        public List<CharacterSkillSO> GetAllDOTSkillEffect()
+        {
+            return _currentActiveStatusEffectWithDuration
+                .Where(x => x.Key.effect == StatusEffect.DOT)
+                .Select(x => x.Key)
+                .ToList();
+        }
+        /// <summary>
+        /// Add status effect to character
+        /// </summary>
+        public void AddStatusEffect(CharacterSkillSO statusEffect,int turnDuration)
+        {
+            //check if already affected dont add
+            if (_currentActiveStatusEffectWithDuration.ContainsKey(statusEffect))
+            {
+                return;
+            }
 
+            _currentActiveStatusEffectWithDuration.Add(statusEffect, turnDuration);
+        }
+        /// <summary>
+        /// Decrease status effect duration in character and remove if expired
+        /// </summary>
+        public void DecreaseStatusEffectDuration()
+        {
+            if(_currentActiveStatusEffectWithDuration.Count == 0)
+            {
+                return;
+            }
+
+            List<CharacterSkillSO> listExpiredStatusEffect = new List<CharacterSkillSO>();
+            foreach (var skill in _currentActiveStatusEffectWithDuration.Keys.ToList())
+            {
+                _currentActiveStatusEffectWithDuration[skill]--;
+                if (_currentActiveStatusEffectWithDuration[skill] <= 0)
+                {
+                    listExpiredStatusEffect.Add(skill);
+                }
+            }
+            foreach (CharacterSkillSO statusEffect in listExpiredStatusEffect)
+            {
+                _currentActiveStatusEffectWithDuration.Remove(statusEffect);
+            }
+        }
         /// <summary>
         /// Change character element
         /// </summary>
@@ -81,6 +152,8 @@ namespace Core.Game
             {
                 isDead = true;
             }
+            //floating text
+            FloatingTextManager.Instance.ShowFloatingText(Mathf.CeilToInt(damageIN).ToString(), FloatingTextType.Damage, transform);
         }
         /// <summary>
         /// Skill use mana
@@ -93,6 +166,10 @@ namespace Core.Game
         /// <summary>
         /// Basic attack add mana
         /// </summary>
+        public void AddManaFromBasicAttack()
+        {
+            AddMana(20);
+        }
         public void AddMana(float value)
         {
             if(_currentMana == GetMaxMana())
@@ -101,6 +178,8 @@ namespace Core.Game
             }
             _currentMana = _currentMana + value;
             BattleGUIManager.Instance.UpdateManaUI();
+            //floating text
+            FloatingTextManager.Instance.ShowFloatingText("20", FloatingTextType.GainMana, transform);
         }
         public float GetMaxHP()
         {
@@ -146,7 +225,7 @@ namespace Core.Game
         /// </summary>
         public void AddSkill(CharacterSkillSO skill)
         {
-            listOwnedSkill.Add(skill);
+            _listOwnedSkill.Add(skill);
             //add skill to panel
             PlayerSkillActionPanelManager.Instance.AddSkill(skill);
         }

@@ -4,7 +4,7 @@ using UnityEngine;
 
 namespace Core.Game
 {
-    public enum SkillEffect
+    public enum StatusEffect
     {
         None,
         Stun,//skip character move for some turn
@@ -32,7 +32,7 @@ namespace Core.Game
         public float manaCost;//skill mana cost
         public float damage;//skill damage if available add value
         [Header("Skill Effect")]
-        public SkillEffect effect = SkillEffect.None;//skill effect if available pick one of 2
+        public StatusEffect effect = StatusEffect.None;//skill effect if available pick one of 2
         public int effectTurn = 0;//character affected turn
         public float dotDamage;//skill damage overtime if skill effect dot
         public SkillMinigame minigame;//skill minigame for player, player need to win the minigame to activate skill

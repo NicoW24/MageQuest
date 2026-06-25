@@ -59,8 +59,11 @@ namespace UI.Game
                 }
 
                 //only close opened panel
-                if(panel.gameObject.activeSelf)
-                    panel.ClosePanel();
+                if(panel != null)
+                {
+                    if (panel.gameObject.activeSelf)
+                        panel.ClosePanel();
+                }
             }
             else
             {

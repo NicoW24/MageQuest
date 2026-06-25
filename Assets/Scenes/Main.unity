@@ -271,33 +271,17 @@ PrefabInstance:
     m_TransformParent: {fileID: 899362241}
     m_Modifications:
     - target: {fileID: 136621098651619301, guid: e084d532896efda4fb426695601bff9d, type: 3}
-      propertyPath: listOwnedSkill.Array.size
-      value: 6
+      propertyPath: _listOwnedSkill.Array.size
+      value: 3
       objectReference: {fileID: 0}
     - target: {fileID: 136621098651619301, guid: e084d532896efda4fb426695601bff9d, type: 3}
-      propertyPath: 'listOwnedSkill.Array.data[0]'
-      value: 
-      objectReference: {fileID: 11400000, guid: e270a09bc27bd004db16d3d4629f5773, type: 2}
-    - target: {fileID: 136621098651619301, guid: e084d532896efda4fb426695601bff9d, type: 3}
-      propertyPath: 'listOwnedSkill.Array.data[1]'
-      value: 
-      objectReference: {fileID: 11400000, guid: 73144bc730d05024297eef7719b0a5c8, type: 2}
-    - target: {fileID: 136621098651619301, guid: e084d532896efda4fb426695601bff9d, type: 3}
-      propertyPath: 'listOwnedSkill.Array.data[2]'
-      value: 
-      objectReference: {fileID: 11400000, guid: 571df3a03a820654aaf8669d61ebf1ad, type: 2}
-    - target: {fileID: 136621098651619301, guid: e084d532896efda4fb426695601bff9d, type: 3}
-      propertyPath: 'listOwnedSkill.Array.data[3]'
-      value: 
-      objectReference: {fileID: 11400000, guid: 91a511dc46acd6847a384a771c802abb, type: 2}
-    - target: {fileID: 136621098651619301, guid: e084d532896efda4fb426695601bff9d, type: 3}
-      propertyPath: 'listOwnedSkill.Array.data[4]'
-      value: 
-      objectReference: {fileID: 11400000, guid: 0aac3e3e013c5bb4bbd539851342c038, type: 2}
-    - target: {fileID: 136621098651619301, guid: e084d532896efda4fb426695601bff9d, type: 3}
-      propertyPath: 'listOwnedSkill.Array.data[5]'
+      propertyPath: '_listOwnedSkill.Array.data[1]'
       value: 
       objectReference: {fileID: 11400000, guid: 3bf863475b8f1164aa4899e1952c883e, type: 2}
+    - target: {fileID: 136621098651619301, guid: e084d532896efda4fb426695601bff9d, type: 3}
+      propertyPath: '_listOwnedSkill.Array.data[2]'
+      value: 
+      objectReference: {fileID: 11400000, guid: 73144bc730d05024297eef7719b0a5c8, type: 2}
     - target: {fileID: 1890957361471457041, guid: e084d532896efda4fb426695601bff9d, type: 3}
       propertyPath: m_Name
       value: Player_MainChar

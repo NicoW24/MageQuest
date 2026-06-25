@@ -35,6 +35,9 @@ namespace Core.Game
             CheckAvailableSkill();
         }
 
+        /// <summary>
+        /// Disable skill that can't be executed because of mana cost
+        /// </summary>
         void CheckAvailableSkill()
         {
             //disable skill that can't execute because mana cost
@@ -43,19 +46,25 @@ namespace Core.Game
                 skillButton.GetButton().interactable = BattleManager.Instance.GetPlayerStat().GetCurrentMana() >= skillButton.GetSkill().manaCost;
             }
         }
-
+        /// <summary>
+        /// Add new skill to UI
+        /// </summary>
         public void AddSkill(CharacterSkillSO skill)
         {
             SkillActionButton newSkillButton = Instantiate(_skillActionButtonPrefab, _skillActionButtonContent);
             newSkillButton.SetupSkillActionButton(skill);
             listSpawnedSkill.Add(newSkillButton);
         }
-
+        /// <summary>
+        /// Open skill panel
+        /// </summary>
         public void OpenPanel()
         {
             gameObject.SetActive(true);
         }
-
+        /// <summary>
+        /// Close skill panel
+        /// </summary>
         public void ClosePanel()
         {
             gameObject.SetActive(false);

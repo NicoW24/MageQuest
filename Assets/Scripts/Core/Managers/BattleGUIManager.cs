@@ -68,9 +68,12 @@ namespace Core.Game
             if (_enemyHPRoutine != null)
                 StopCoroutine(_enemyHPRoutine);
 
-            _playerHPRoutine = StartCoroutine(AnimateSliderBar(_player.GetCurrentHP(), _PlayerHPBar));
+            if (gameObject.activeSelf)
+            {
+                _playerHPRoutine = StartCoroutine(AnimateSliderBar(_player.GetCurrentHP(), _PlayerHPBar));
 
-            _enemyHPRoutine = StartCoroutine(AnimateSliderBar(_enemy.GetCurrentHP(), _EnemyHPBar));
+                _enemyHPRoutine = StartCoroutine(AnimateSliderBar(_enemy.GetCurrentHP(), _EnemyHPBar));
+            }
         }
         Coroutine _playerManaRoutine;
         public void UpdateManaUI()
@@ -78,7 +81,10 @@ namespace Core.Game
             if (_playerManaRoutine != null)
                 StopCoroutine(_playerManaRoutine);
 
-            _playerManaRoutine = StartCoroutine(AnimateSliderBar(_player.GetCurrentMana(), _PlayerManaBar));
+            if (gameObject.activeSelf)
+            {
+                _playerManaRoutine = StartCoroutine(AnimateSliderBar(_player.GetCurrentMana(), _PlayerManaBar));
+            }
         }
         /// <summary>
         /// Animate slider bar
@@ -105,14 +111,14 @@ namespace Core.Game
         /// </summary>
         public void PlayerAttack()
         {
-            BattleManager.Instance.OnPlayerAction(0);
+            BattleManager.Instance.OnPlayerAction(PlayerAction.Attack);
         }
         /// <summary>
         /// On click defend button
         /// </summary>
         public void PlayerDefend()
         {
-            BattleManager.Instance.OnPlayerAction(1);
+            BattleManager.Instance.OnPlayerAction(PlayerAction.Defend);
         }
         /// <summary>
         /// On click skill button

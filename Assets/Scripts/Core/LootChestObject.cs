@@ -43,14 +43,16 @@ namespace Core.Game
             CharacterStat playerStat = BattleManager.Instance.GetPlayerStat();
             
             //get random unowned skill from chest
-            List<CharacterSkillSO> listUnownedSkill = BattleManager.Instance.listAllCharacterSkill.Except(playerStat.listOwnedSkill).ToList();
-            CharacterSkillSO rewardSkill = listUnownedSkill[Random.Range(0, listUnownedSkill.Count)];
-            playerStat.AddSkill(rewardSkill);
+            List<CharacterSkillSO> listUnownedSkill = BattleManager.Instance.ListAllCharacterSkill.Except(playerStat.listOwnedSkill).ToList();
+            if(listUnownedSkill.Count > 0)
+            {
+                CharacterSkillSO rewardSkill = listUnownedSkill[Random.Range(0, listUnownedSkill.Count)];
+                playerStat.AddSkill(rewardSkill);
 
-            //setup skill detail panel
-            SkillDetailPanelManager.Instance.SetData(rewardSkill,this);
-            PanelManager.Instance.OpenPanel("ObtainSkillDetail");
-
+                //setup skill detail panel
+                SkillDetailPanelManager.Instance.SetData(rewardSkill, this);
+                PanelManager.Instance.OpenPanel("ObtainSkillDetail");
+            }
             hasLoot = false;
         }
         /// <summary>

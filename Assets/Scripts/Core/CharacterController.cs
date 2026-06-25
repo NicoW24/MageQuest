@@ -2,6 +2,7 @@ using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
+using UI.Game;
 using UnityEngine;
 
 namespace Core.Game
@@ -16,6 +17,7 @@ namespace Core.Game
         protected bool _isAlive = true;//another variable to stop update function that controls the character when character is not alive 
         protected float _initialSpriteDir;//starting char sprite direction
         protected Vector2 _initialCharPos;
+        Vector3 _startBattlePos;
 
         [Header("Effects")]
         public Transform effectContainer;
@@ -141,7 +143,6 @@ namespace Core.Game
         public virtual void Attack(int animationIndex=0)
         {
             PlayStateAnimation(PlayerState.ATTACK, animationIndex);
-            PlayStateAnimation(PlayerState.IDLE);
         }
         /// <summary>
         /// Character defend function
@@ -159,6 +160,8 @@ namespace Core.Game
         /// </summary>
         public virtual void Stun()
         {
+            //floatingText stun
+            FloatingTextManager.Instance.ShowFloatingText("Stunned", FloatingTextType.StatusEffect, transform);
             PlayStateAnimation(PlayerState.DEBUFF, 0);
         }
         /// <summary>
@@ -173,6 +176,9 @@ namespace Core.Game
             GetComponent<Rigidbody2D>().bodyType = RigidbodyType2D.Static;
             _isAlive = false;
         }
+        /// <summary>
+        /// Restart character so it can work normally after death
+        /// </summary>
         public void RestartCharacter()
         {
             if (!gameObject.activeSelf)
@@ -190,10 +196,16 @@ namespace Core.Game
             GetComponent<BoxCollider2D>().enabled = true;
             GetComponent<Rigidbody2D>().bodyType = RigidbodyType2D.Dynamic;
         }
+        /// <summary>
+        /// Check if character is alive
+        /// </summary>
         public bool IsAlive()
         {
             return _isAlive;
         }
+        /// <summary>
+        /// Function when event battle started is invoked
+        /// </summary>
         public void BattleStarted()
         {
             if (!IsAlive())
@@ -203,7 +215,19 @@ namespace Core.Game
             _canMove = false;
             //set idle
             PlayStateAnimation(PlayerState.IDLE);
+
+            //move enemy character to battle position
+            if(this != BattleManager.Instance.GetPlayerStat().GetController())
+            {
+                Vector3 attackPos = BattleManager.Instance.GetPlayerStat().transform.position + Vector3.right * 10f;
+                transform.position = attackPos;
+            }
+
+            _startBattlePos = transform.position;
         }
+        /// <summary>
+        /// Function when event battle ended is invoked
+        /// </summary>
         public void BattleEnded()
         {
             if (!IsAlive())
@@ -214,15 +238,17 @@ namespace Core.Game
             //set idle
             PlayStateAnimation(PlayerState.IDLE);
         }
+        /// <summary>
+        /// Spawn particle skill for skill action
+        /// </summary>
         public void SpawnParticleSkill(ParticleSystem ps, bool shoot, CharacterController target)//if shoot false spawn at enemy
         {
-            _currentUsedParticle = _spawnedParticles.Where(x => x.Key == ps.name).FirstOrDefault().Value;
-            if (_currentUsedParticle == null)
+            if (!_spawnedParticles.TryGetValue(ps.name, out _currentUsedParticle))
             {
-                ParticleSystem newPs = Instantiate(ps, effectContainer);
-                _spawnedParticles.Add(ps.name, newPs);
-                _currentUsedParticle = newPs;
+                _currentUsedParticle = Instantiate(ps, effectContainer);
+                _spawnedParticles.Add(ps.name, _currentUsedParticle);
             }
+            _currentUsedParticle.gameObject.SetActive(true);
             _currentUsedParticle.Clear();
             //if not shoot spawn at target
             if (!shoot)
@@ -234,6 +260,35 @@ namespace Core.Game
         }
 
         #region Coroutine for particle and animation
+        /// <summary>
+        /// Melee attack sequence character approach target and do basic attack
+        /// </summary>
+        public IEnumerator PlayMeleeAttackSequence(Vector3 targetPosition)
+        {
+            while (Vector3.Distance(transform.position, targetPosition) > 3f)
+            {
+                MoveTowards(targetPosition, 5f);
+                yield return null;
+            }
+
+            Attack();
+            while (!AnimationDone())
+            {
+                yield return null;
+            }
+        }
+        /// <summary>
+        /// After melee attack sequence character back to starting battle position
+        /// </summary>
+        public IEnumerator ReturnToStartingBattlePosition()
+        {
+            while (Vector3.Distance(transform.position, _startBattlePos) > 0.05f)
+            {
+                MoveTowards(_startBattlePos, 5f);
+                yield return null;
+            }
+            Idle();
+        }
         /// <summary>
         /// Coroutine to disable particle system after particle died
         /// </summary>
