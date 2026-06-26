@@ -9,6 +9,7 @@ namespace Core.Game
         [SerializeField] SkillActionButton _skillActionButtonPrefab;
         [SerializeField] Transform _skillActionButtonContent;
         List<SkillActionButton> listSpawnedSkill = new List<SkillActionButton>();
+
         public static PlayerSkillActionPanelManager Instance;
 
         void Awake()

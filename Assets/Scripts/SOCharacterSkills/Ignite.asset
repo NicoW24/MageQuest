@@ -13,7 +13,7 @@ MonoBehaviour:
   m_Name: Ignite
   m_EditorClassIdentifier: Core.Game::Core.Game.CharacterSkillSO
   skillName: Ignite
-  skillDesc: 
+  skillDesc: Ignite enemy and burn them for 2 turn
   skillElement: 0
   manaCost: 20
   damage: 0

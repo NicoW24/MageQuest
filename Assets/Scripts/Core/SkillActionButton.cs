@@ -8,11 +8,10 @@ namespace Core.Game
     {
         CharacterSkillSO _skill;
         [SerializeField] TextMeshProUGUI _skillNameText;
-        Button _button;
+        [SerializeField] Button _button;
 
         void Awake()
         {
-            _button = GetComponent<Button>();
             _button.onClick.AddListener(OnClickSkill);
         }
 

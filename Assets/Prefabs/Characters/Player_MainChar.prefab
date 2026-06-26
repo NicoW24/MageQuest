@@ -13,6 +13,7 @@ GameObject:
   - component: {fileID: 6960397765709536460}
   - component: {fileID: 1299344841010022288}
   - component: {fileID: 8305190222147615239}
+  - component: {fileID: 6977102150765644906}
   m_Layer: 0
   m_Name: Player_MainChar
   m_TagString: Player
@@ -147,6 +148,23 @@ BoxCollider2D:
   m_AutoTiling: 0
   m_Size: {x: 1.2, y: 2}
   m_EdgeRadius: 0
+--- !u!114 &6977102150765644906
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1890957361471457041}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 8ae855b00fe616446a20766f3f64ce07, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Core.Game::Core.Game.CustomizePlayerCharacter
+  _hairRenderer: {fileID: 7841881443939433447}
+  _lArmRenderer: {fileID: 2718268021864580729}
+  _rArmRenderer: {fileID: 7156323925318802718}
+  _topRenderer: {fileID: 4937314185256533354}
+  _capeRenderer: {fileID: 177757915530343453}
 --- !u!1 &3539774929142974534
 GameObject:
   m_ObjectHideFlags: 0
@@ -285,7 +303,7 @@ PrefabInstance:
     - target: {fileID: 2357788454422818200, guid: 3bf4c54d34f844ab5ad8f561d24b0052, type: 3}
       propertyPath: m_Sprite
       value: 
-      objectReference: {fileID: -3137994370387717294, guid: 4f75ae73445284b5393c219fadb2dc65, type: 3}
+      objectReference: {fileID: 142190170752318335, guid: 32122f87f9a7545c38ded467d0b41b13, type: 3}
     - target: {fileID: 4721297784204891787, guid: 3bf4c54d34f844ab5ad8f561d24b0052, type: 3}
       propertyPath: m_Sprite
       value: 
@@ -325,7 +343,7 @@ PrefabInstance:
     - target: {fileID: 7372930216507275007, guid: 3bf4c54d34f844ab5ad8f561d24b0052, type: 3}
       propertyPath: m_Sprite
       value: 
-      objectReference: {fileID: -4607344544876785824, guid: 4f75ae73445284b5393c219fadb2dc65, type: 3}
+      objectReference: {fileID: -9035144544001989217, guid: 32122f87f9a7545c38ded467d0b41b13, type: 3}
     - target: {fileID: 7625231775728783366, guid: 3bf4c54d34f844ab5ad8f561d24b0052, type: 3}
       propertyPath: m_Sprite
       value: 
@@ -353,9 +371,19 @@ PrefabInstance:
       insertIndex: -1
       addedObject: {fileID: 9101167790163064227}
   m_SourcePrefab: {fileID: 100100000, guid: 3bf4c54d34f844ab5ad8f561d24b0052, type: 3}
+--- !u!212 &177757915530343453 stripped
+SpriteRenderer:
+  m_CorrespondingSourceObject: {fileID: 537674000920895484, guid: 3bf4c54d34f844ab5ad8f561d24b0052, type: 3}
+  m_PrefabInstance: {fileID: 360769858388454369}
+  m_PrefabAsset: {fileID: 0}
 --- !u!224 &460350749199490203 stripped
 RectTransform:
   m_CorrespondingSourceObject: {fileID: 243978157336016762, guid: 3bf4c54d34f844ab5ad8f561d24b0052, type: 3}
+  m_PrefabInstance: {fileID: 360769858388454369}
+  m_PrefabAsset: {fileID: 0}
+--- !u!212 &2718268021864580729 stripped
+SpriteRenderer:
+  m_CorrespondingSourceObject: {fileID: 2357788454422818200, guid: 3bf4c54d34f844ab5ad8f561d24b0052, type: 3}
   m_PrefabInstance: {fileID: 360769858388454369}
   m_PrefabAsset: {fileID: 0}
 --- !u!1 &4533369268786088097 stripped
@@ -421,3 +449,18 @@ BoxCollider2D:
   m_AutoTiling: 0
   m_Size: {x: 0.27982947, y: 1.1561399}
   m_EdgeRadius: 0
+--- !u!212 &4937314185256533354 stripped
+SpriteRenderer:
+  m_CorrespondingSourceObject: {fileID: 4721297784204891787, guid: 3bf4c54d34f844ab5ad8f561d24b0052, type: 3}
+  m_PrefabInstance: {fileID: 360769858388454369}
+  m_PrefabAsset: {fileID: 0}
+--- !u!212 &7156323925318802718 stripped
+SpriteRenderer:
+  m_CorrespondingSourceObject: {fileID: 7372930216507275007, guid: 3bf4c54d34f844ab5ad8f561d24b0052, type: 3}
+  m_PrefabInstance: {fileID: 360769858388454369}
+  m_PrefabAsset: {fileID: 0}
+--- !u!212 &7841881443939433447 stripped
+SpriteRenderer:
+  m_CorrespondingSourceObject: {fileID: 7625231775728783366, guid: 3bf4c54d34f844ab5ad8f561d24b0052, type: 3}
+  m_PrefabInstance: {fileID: 360769858388454369}
+  m_PrefabAsset: {fileID: 0}

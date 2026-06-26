@@ -212,6 +212,9 @@ namespace Core.Game
             _currentAttack = characterDetailSO.Attack;
             _currentMana = characterDetailSO.Mana;
             _currentElement = characterDetailSO.characterElement;
+
+            //remove all effect
+            _currentActiveStatusEffectWithDuration.Clear();
         }
         /// <summary>
         /// Return character controller, use for battle

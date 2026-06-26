@@ -135,6 +135,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Core.Game::Core.Game.SkillActionButton
   _skillNameText: {fileID: 7314070967212024422}
+  _button: {fileID: 5969379018587000859}
 --- !u!1 &7352527449678540335
 GameObject:
   m_ObjectHideFlags: 0

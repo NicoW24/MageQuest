@@ -26,7 +26,8 @@ namespace UI.Game
             foreach (Panel panel in _listPanel)
             {
                 Panel newPanel = Instantiate(panel, _panelContainer);
-                newPanel.ClosePanel();
+                //to prevent event invoke we dont use function close on first spawn
+                newPanel.gameObject.SetActive(false);
                 string panelName = panel.name.Replace("_Panel", "");
                 _listPanelSpawned.Add(panelName, newPanel);
             }

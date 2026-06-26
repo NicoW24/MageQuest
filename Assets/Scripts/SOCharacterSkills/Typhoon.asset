@@ -13,7 +13,7 @@ MonoBehaviour:
   m_Name: Typhoon
   m_EditorClassIdentifier: Core.Game::Core.Game.CharacterSkillSO
   skillName: Typhoon
-  skillDesc: 
+  skillDesc: Shoot typhoon that give damage
   skillElement: 2
   manaCost: 10
   damage: 15

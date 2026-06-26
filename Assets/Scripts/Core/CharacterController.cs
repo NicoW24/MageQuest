@@ -212,12 +212,11 @@ namespace Core.Game
             {
                 return;
             }
-            _canMove = false;
-            //set idle
-            PlayStateAnimation(PlayerState.IDLE);
 
-            //move enemy character to battle position
-            if(this != BattleManager.Instance.GetPlayerStat().GetController())
+            PauseCharacter();
+
+            //move enemy character to battle position, if the enemy is in battle
+            if(this != BattleManager.Instance.GetPlayerStat().GetController() && this == BattleManager.Instance.GetCurrentEnemy().GetController())
             {
                 Vector3 attackPos = BattleManager.Instance.GetPlayerStat().transform.position + Vector3.right * 10f;
                 transform.position = attackPos;
@@ -229,6 +228,27 @@ namespace Core.Game
         /// Function when event battle ended is invoked
         /// </summary>
         public void BattleEnded()
+        {
+            ResumeCharacter();
+        }
+        /// <summary>
+        /// Stop character movement and set to idle
+        /// </summary>
+        public void PauseCharacter()
+        {
+            if (!IsAlive())
+            {
+                return;
+            }
+
+            _canMove = false;
+            //set idle
+            PlayStateAnimation(PlayerState.IDLE);
+        }
+        /// <summary>
+        /// Resume character movement and set to idle
+        /// </summary>
+        public void ResumeCharacter() 
         {
             if (!IsAlive())
             {
@@ -249,7 +269,16 @@ namespace Core.Game
                 _spawnedParticles.Add(ps.name, _currentUsedParticle);
             }
             _currentUsedParticle.gameObject.SetActive(true);
+            //reset particle scale
+            _currentUsedParticle.transform.localScale = Vector3.one;
             _currentUsedParticle.Clear();
+
+            //flip particle system if enemy char
+            if(this != BattleManager.Instance.GetPlayerStat().GetController())
+            {
+                _currentUsedParticle.transform.localScale = new Vector3(-_currentUsedParticle.transform.localScale.x, _currentUsedParticle.transform.localScale.y,_currentUsedParticle.transform.localScale.z);
+            }
+
             //if not shoot spawn at target
             if (!shoot)
             {

@@ -13,7 +13,7 @@ MonoBehaviour:
   m_Name: Iceblast
   m_EditorClassIdentifier: Core.Game::Core.Game.CharacterSkillSO
   skillName: Iceblast
-  skillDesc: 
+  skillDesc: Blast ice to enemy and stun them for 2 turn
   skillElement: 1
   manaCost: 20
   damage: 0

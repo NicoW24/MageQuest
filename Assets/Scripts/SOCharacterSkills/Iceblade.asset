@@ -13,7 +13,7 @@ MonoBehaviour:
   m_Name: Iceblade
   m_EditorClassIdentifier: Core.Game::Core.Game.CharacterSkillSO
   skillName: Iceblade
-  skillDesc: 
+  skillDesc: Shoot ice blade that gives damage
   skillElement: 1
   manaCost: 10
   damage: 15

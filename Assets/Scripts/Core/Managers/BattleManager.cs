@@ -20,6 +20,12 @@ public enum PlayerAction
     Skill
 }
 
+public enum EnemyAction
+{
+    Attack,
+    Skill
+}
+
 namespace Core.Game
 {
     public class BattleManager : MonoBehaviour
@@ -92,6 +98,13 @@ namespace Core.Game
         public CharacterStat GetPlayerStat()
         {
             return _playerCharacter;
+        }
+        /// <summary>
+        /// Function to get current enemy character stat
+        /// </summary>
+        public CharacterStat GetCurrentEnemy()
+        {
+            return _currentEnemy;
         }
         /// <summary>
         /// Function to get battle state
@@ -305,17 +318,17 @@ namespace Core.Game
         /// <summary>
         /// Coroutine for character attack
         /// </summary>
-        IEnumerator CharacterAttackSequence(CharacterStat _currentCharacter, CharacterStat Target)
+        IEnumerator CharacterAttackSequence(CharacterStat currentCharacter, CharacterStat Target)
         {
-            float damage = _currentCharacter.GetCurrentAttack();
+            float damage = currentCharacter.GetCurrentAttack();
             //character attack animation
             //start attack sequence
-            yield return StartCoroutine(_currentCharacter.GetController().PlayMeleeAttackSequence(Target.transform.position));
+            yield return StartCoroutine(currentCharacter.GetController().PlayMeleeAttackSequence(Target.transform.position));
 
             //player can charge mana from basic attack
-            if(_currentCharacter == _playerCharacter)
+            if(currentCharacter == _playerCharacter)
             {
-                _currentCharacter.AddManaFromBasicAttack();
+                currentCharacter.AddManaFromBasicAttack();
             }
 
             //character give damage to target
@@ -327,7 +340,39 @@ namespace Core.Game
             //add delay after giving damage
             yield return new WaitForSeconds(1.2f);
             //move character to starting pos
-            yield return StartCoroutine(_currentCharacter.GetController().ReturnToStartingBattlePosition());
+            yield return StartCoroutine(currentCharacter.GetController().ReturnToStartingBattlePosition());
+        }
+        /// <summary>
+        /// Coroutine for character skill
+        /// </summary>
+        IEnumerator CharacterSkillSequence(CharacterStat currentCharacter,CharacterStat target, CharacterSkillSO skill)
+        {
+            //set skill cast animation
+            currentCharacter.GetController().Attack(skill.skillAttackAnimationIndex);
+            //wait for skill cast animation
+            while (!currentCharacter.GetController().AnimationDone())
+                yield return null;
+            //spawn skill particle system either shoot from character or spawn at target
+            currentCharacter.GetController().SpawnParticleSkill(skill.skillParticle, skill.shouldShoot, target.GetController());
+            //wait until particle reach target
+            yield return new WaitForSeconds(skill.skillParticle.main.duration);
+            //skill damage
+            bool weakness = target.IsSkillWeakness(skill.skillElement);
+            float damage = currentCharacter.GetCurrentAttack() + skill.damage;
+            //mana cost
+            currentCharacter.DecreaseMana(skill.manaCost);
+            //if skill weakness of target add more damage
+            if (weakness)
+            {
+                damage = damage * 2;
+                FloatingTextManager.Instance.ShowFloatingText("Weakness", FloatingTextType.Damage, target.transform);
+            }
+            //add status effect to target if available
+            if (skill.effect != StatusEffect.None)
+                target.AddStatusEffect(skill, skill.effectTurn);
+
+            //player give damage to enemy
+            yield return StartCoroutine(GiveDamage(damage, target));
         }
         #region Player Turn
         /// <summary>
@@ -497,32 +542,7 @@ namespace Core.Game
                 //if win skill execute
                 if (currentMinigame.IsPlayerWin())
                 {
-                    //set skill cast animation
-                    _playerCharController.Attack(skill.skillAttackAnimationIndex);
-                    //wait for skill cast animation
-                    while (!_playerCharController.AnimationDone())
-                        yield return null;
-                    //spawn skill particle system either shoot from player or spawn at enemy
-                    _playerCharController.SpawnParticleSkill(skill.skillParticle, skill.shouldShoot, _currentEnemyCharController);
-                    //wait until particle reach enemy
-                    yield return new WaitForSeconds(skill.skillParticle.main.duration);
-                    //skill damage
-                    bool weakness = _currentEnemy.IsSkillWeakness(skill.skillElement);
-                    float damage = _playerCharacter.GetCurrentAttack() + skill.damage;
-                    //mana cost
-                    _playerCharacter.DecreaseMana(skill.manaCost);
-                    //if skill weakness of enemy add more damage
-                    if (weakness)
-                    {
-                        damage = damage * 2;
-                        FloatingTextManager.Instance.ShowFloatingText("Weakness", FloatingTextType.Damage, _currentEnemy.transform);
-                    }
-                    //add status effect if available
-                    if (skill.effect != StatusEffect.None)
-                        _currentEnemy.AddStatusEffect(skill, skill.effectTurn);
-
-                    //player give damage to enemy
-                    yield return StartCoroutine(GiveDamage(damage, _currentEnemy));
+                    yield return StartCoroutine(CharacterSkillSequence(_playerCharacter,_currentEnemy,skill));
                     //stop the loop if battle ended either win or lose
                     if (IsBattleEnded())
                         yield break;
@@ -541,9 +561,9 @@ namespace Core.Game
             }
             else
             {
-                _currentEnemyCharController.Stun();
+                _playerCharController.Stun();
                 //wait for animation finished
-                while (!_currentEnemyCharController.AnimationDone())
+                while (!_playerCharController.AnimationDone())
                     yield return null;
                 //delay
                 yield return new WaitForSeconds(0.5f);
@@ -583,8 +603,39 @@ namespace Core.Game
 
             if (!_currentCharacterStunned)
             {
+                //randomize enemy action
+                EnemyAction chosenAction = EnemyAction.Attack;
+                //randomize enemy skill
+                CharacterSkillSO skill = _currentEnemy.listOwnedSkill[Random.Range(0, _currentEnemy.listOwnedSkill.Count)];
+                //only randomize action if enemy has skill
+                if (_currentEnemy.listOwnedSkill.Count > 0)
+                {
+                    //use weight action
+                    float randomValue = Random.value;
+                    if (randomValue < 0.70f)
+                    {
+                        chosenAction = EnemyAction.Attack;
+                    }
+                    else
+                    {
+                        //check mana
+                        if(_currentEnemy.GetCurrentMana() >= skill.manaCost)
+                        {
+                            chosenAction = EnemyAction.Skill;
+                        }
+                    }
+                }
+
                 #region Attack
-                yield return StartCoroutine(CharacterAttackSequence(_currentEnemy,_playerCharacter));
+                if (chosenAction == EnemyAction.Attack)
+                {
+                    yield return StartCoroutine(CharacterAttackSequence(_currentEnemy, _playerCharacter));
+                }
+                else
+                {
+                    //enemy skill sequence
+                    yield return StartCoroutine(CharacterSkillSequence(_currentEnemy, _playerCharacter, skill));
+                }
                 //stop the loop if battle ended either win or lose
                 if (IsBattleEnded())
                     yield break;

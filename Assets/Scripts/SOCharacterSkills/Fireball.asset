@@ -13,7 +13,7 @@ MonoBehaviour:
   m_Name: Fireball
   m_EditorClassIdentifier: Core.Game::Core.Game.CharacterSkillSO
   skillName: Fireball
-  skillDesc: 
+  skillDesc: Shoot fireball that give damage
   skillElement: 0
   manaCost: 10
   damage: 15
