@@ -14,7 +14,8 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   characterName: Tank Skeleton
   characterElement: 2
-  HP: 200
+  characterType: 1
+  HP: 150
   Def: 5
   Attack: 10
   Mana: 40

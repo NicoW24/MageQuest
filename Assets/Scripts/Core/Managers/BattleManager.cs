@@ -23,7 +23,8 @@ public enum PlayerAction
 public enum EnemyAction
 {
     Attack,
-    Skill
+    Skill,
+    FinalBuff
 }
 
 namespace Core.Game
@@ -626,15 +627,47 @@ namespace Core.Game
                     }
                 }
 
+                //boss action
+                if (_currentEnemy.characterDetailSO.characterType == CharacterType.Boss)
+                {
+                    //when skill can change character element
+                    if (chosenAction == EnemyAction.Skill)
+                    {
+                        _currentEnemy.ChangeElement(skill.skillElement);
+                        FloatingTextManager.Instance.ShowFloatingText($"Boss changed element to {skill.skillElement.ToString()}", FloatingTextType.StatusEffect, _currentEnemy.transform);
+                    }
+
+                    //when hp is low boss will get enrage
+                    if(_currentEnemy.GetCurrentHP() <= 50 && !_currentEnemy.IsEnrage())
+                    {
+                        chosenAction = EnemyAction.FinalBuff;
+                    }
+                }
+
                 #region Attack
                 if (chosenAction == EnemyAction.Attack)
                 {
                     yield return StartCoroutine(CharacterAttackSequence(_currentEnemy, _playerCharacter));
                 }
-                else
+                else if(chosenAction == EnemyAction.Skill)
                 {
                     //enemy skill sequence
                     yield return StartCoroutine(CharacterSkillSequence(_currentEnemy, _playerCharacter, skill));
+                }
+                else
+                {
+                    //boss berserk
+                    //set buff animation
+                    _currentEnemyCharController.Buff();
+                    //wait for skill cast animation
+                    while (!_currentEnemyCharController.AnimationDone())
+                        yield return null;
+
+                    //delay
+                    yield return new WaitForSeconds(1f);
+
+                    //add attack buff
+                    _currentEnemy.Enrage();
                 }
                 //stop the loop if battle ended either win or lose
                 if (IsBattleEnded())

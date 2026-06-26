@@ -14,7 +14,8 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   characterName: The Player
   characterElement: 0
+  characterType: 0
   HP: 200
   Def: 10
-  Attack: 15
+  Attack: 20
   Mana: 50

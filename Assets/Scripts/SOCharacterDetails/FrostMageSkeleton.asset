@@ -14,6 +14,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   characterName: Frost Mage Skeleton
   characterElement: 1
+  characterType: 1
   HP: 100
   Def: 5
   Attack: 15

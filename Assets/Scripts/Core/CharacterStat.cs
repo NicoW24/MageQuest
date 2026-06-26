@@ -22,10 +22,15 @@ namespace Core.Game
         [SerializeField] float _currentMana;
         Elements _currentElement;
 
+        [Header("Battle Behaviour")]
+        public float basicAttackChance = 0.7f;//chance for basic attack default is 70% and skill is 30%
+
         Dictionary<CharacterSkillSO,int> _currentActiveStatusEffectWithDuration = new Dictionary<CharacterSkillSO, int>();//current character active status effect and its duration
 
         [SerializeField] List<CharacterSkillSO> _listOwnedSkill = new List<CharacterSkillSO>();
         public IReadOnlyList<CharacterSkillSO> listOwnedSkill => _listOwnedSkill;
+
+        bool _isEnrage = false;
 
         public bool isDead = false;
 
@@ -181,6 +186,10 @@ namespace Core.Game
             //floating text
             FloatingTextManager.Instance.ShowFloatingText("20", FloatingTextType.GainMana, transform);
         }
+        public CharacterType GetCharacterType()
+        {
+            return characterDetailSO.characterType;
+        }
         public float GetMaxHP()
         {
             return characterDetailSO.HP;
@@ -196,6 +205,15 @@ namespace Core.Game
         public float GetCurrentMana()
         {
             return _currentMana;
+        }
+        /// <summary>
+        /// Enrage state make attack double
+        /// </summary>
+        public void Enrage()
+        {
+            _currentAttack *= 2;
+            _isEnrage = true;
+            FloatingTextManager.Instance.ShowFloatingText($"Boss is enraged, attack has double damage!", FloatingTextType.StatusEffect, transform);
         }
         public float GetCurrentAttack()
         {
@@ -215,6 +233,12 @@ namespace Core.Game
 
             //remove all effect
             _currentActiveStatusEffectWithDuration.Clear();
+            isDead = false;
+            _isEnrage = false;
+        }
+        public bool IsEnrage()
+        {
+            return _isEnrage;
         }
         /// <summary>
         /// Return character controller, use for battle

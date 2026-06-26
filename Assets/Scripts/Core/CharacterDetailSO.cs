@@ -14,6 +14,15 @@ namespace Core.Game
         Nature
     }
     /// <summary>
+    /// Character type for now used only for differentiate action behaviour from mob and boss
+    /// </summary>
+    public enum CharacterType
+    {
+        Player,
+        Mob,
+        Boss
+    }
+    /// <summary>
     /// This detail is used for enemy and player (character that can do battle)
     /// </summary>
     [CreateAssetMenu(fileName = "New Character", menuName = "Game/Character")]
@@ -23,6 +32,8 @@ namespace Core.Game
         public string characterName;
         //character element
         public Elements characterElement;
+        //character type
+        public CharacterType characterType;
 
         //character initial stats
         public float HP;

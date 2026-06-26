@@ -15,7 +15,7 @@ GameObject:
   - component: {fileID: 2639265156470144066}
   m_Layer: 0
   m_Name: FrostMageSkeleton_Enemy
-  m_TagString: Untagged
+  m_TagString: Enemy
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
@@ -54,6 +54,7 @@ MonoBehaviour:
   _currentDef: 0
   _currentAttack: 0
   _currentMana: 0
+  basicAttackChance: 0.7
   _listOwnedSkill:
   - {fileID: 11400000, guid: 571df3a03a820654aaf8669d61ebf1ad, type: 2}
   - {fileID: 11400000, guid: 91a511dc46acd6847a384a771c802abb, type: 2}
@@ -70,7 +71,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: c031c33f17e455c479e7095e13e83d42, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  moveSpeed: 2
+  moveSpeed: 3
   effectContainer: {fileID: 6833473275316482004}
   patrolDistance: 3
   patrolWaitTime: 1.5

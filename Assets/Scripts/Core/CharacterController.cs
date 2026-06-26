@@ -145,6 +145,13 @@ namespace Core.Game
             PlayStateAnimation(PlayerState.ATTACK, animationIndex);
         }
         /// <summary>
+        /// Character buff function
+        /// </summary>
+        public virtual void Buff(int animationIndex = 1)
+        {
+            PlayStateAnimation(PlayerState.OTHER, animationIndex);
+        }
+        /// <summary>
         /// Character defend function
         /// </summary>
         public virtual void Defend(){}
@@ -187,7 +194,7 @@ namespace Core.Game
             }
 
             //reset animation
-            PlayStateAnimation(PlayerState.IDLE);
+            Idle();
             //reset pos and variables
             transform.position = _initialCharPos;
             _isAlive = true;
@@ -243,7 +250,7 @@ namespace Core.Game
 
             _canMove = false;
             //set idle
-            PlayStateAnimation(PlayerState.IDLE);
+            Idle();
         }
         /// <summary>
         /// Resume character movement and set to idle
@@ -256,7 +263,7 @@ namespace Core.Game
             }
             _canMove = true;
             //set idle
-            PlayStateAnimation(PlayerState.IDLE);
+            Idle();
         }
         /// <summary>
         /// Spawn particle skill for skill action
