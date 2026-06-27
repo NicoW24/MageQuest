@@ -29,7 +29,7 @@ namespace Core.Game
         {
             //setup player owned skill
             CharacterStat playerStat = BattleManager.Instance.GetPlayerStat();
-            foreach(CharacterSkillSO playerSkill in playerStat.listOwnedSkill)
+            foreach (CharacterSkillSO playerSkill in playerStat.listOwnedSkill)
             {
                 AddSkill(playerSkill);
             }
@@ -52,23 +52,36 @@ namespace Core.Game
         /// </summary>
         public void AddSkill(CharacterSkillSO skill)
         {
-            SkillActionButton newSkillButton = Instantiate(_skillActionButtonPrefab, _skillActionButtonContent);
-            newSkillButton.SetupSkillActionButton(skill);
-            listSpawnedSkill.Add(newSkillButton);
+            bool skillIsNew = true;
+            foreach(SkillActionButton button in listSpawnedSkill)
+            {
+                if(skill == button.GetSkill())
+                {
+                    skillIsNew = false;
+                }
+            }
+
+            if (skillIsNew)
+            {
+                SkillActionButton newSkillButton = Instantiate(_skillActionButtonPrefab, _skillActionButtonContent);
+                newSkillButton.SetupSkillActionButton(skill);
+                listSpawnedSkill.Add(newSkillButton);
+            }
         }
         /// <summary>
         /// Open skill panel
         /// </summary>
-        public void OpenPanel()
+        public void TogglePanel()
         {
-            gameObject.SetActive(true);
+            gameObject.SetActive(!gameObject.activeSelf);
         }
         /// <summary>
         /// Close skill panel
         /// </summary>
         public void ClosePanel()
         {
-            gameObject.SetActive(false);
+            if(gameObject.activeSelf)
+                gameObject.SetActive(false);
         }
     }
 }

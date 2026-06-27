@@ -15,9 +15,11 @@ namespace Core.Game
         PlayerCharacterController _playerController;
 
         LootChestObject _lootChestObject;
+        NPCCharacterDialogObject _npcDialogObject;
 
         void Awake()
         {
+            _npcDialogObject = GetComponent<NPCCharacterDialogObject>();
             _lootChestObject = GetComponent<LootChestObject>();
         }
         /// <summary>
@@ -63,6 +65,9 @@ namespace Core.Game
                         _lootChestObject.HideChest();
                 }
 
+                //close skill panel
+                PanelManager.Instance.ClosePanel("ObtainSkillDetail");
+
                 //remove interactable object from player
                 _playerController.SetInteractableObject(null);
                 PanelManager.Instance.ClosePanel("InteractNotif");
@@ -74,6 +79,13 @@ namespace Core.Game
         public LootChestObject GetChestObject()
         {
             return _lootChestObject;
+        }
+        /// <summary>
+        /// Get dialog object
+        /// </summary>
+        public NPCCharacterDialogObject GetDialogObject()
+        {
+            return _npcDialogObject;
         }
     }
 }

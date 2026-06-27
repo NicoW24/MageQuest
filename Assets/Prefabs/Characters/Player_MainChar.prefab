@@ -14,6 +14,7 @@ GameObject:
   - component: {fileID: 1299344841010022288}
   - component: {fileID: 8305190222147615239}
   - component: {fileID: 6977102150765644906}
+  - component: {fileID: 2590173229324088662}
   m_Layer: 0
   m_Name: Player_MainChar
   m_TagString: Player
@@ -55,8 +56,8 @@ MonoBehaviour:
   _currentDef: 0
   _currentAttack: 0
   _currentMana: 0
-  _listOwnedSkill:
-  - {fileID: 11400000, guid: e270a09bc27bd004db16d3d4629f5773, type: 2}
+  basicAttackChance: 0.7
+  _listOwnedSkill: []
   isDead: 0
 --- !u!114 &6960397765709536460
 MonoBehaviour:
@@ -165,6 +166,28 @@ MonoBehaviour:
   _rArmRenderer: {fileID: 7156323925318802718}
   _topRenderer: {fileID: 4937314185256533354}
   _capeRenderer: {fileID: 177757915530343453}
+--- !u!95 &2590173229324088662
+Animator:
+  serializedVersion: 7
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1890957361471457041}
+  m_Enabled: 1
+  m_Avatar: {fileID: 0}
+  m_Controller: {fileID: 0}
+  m_CullingMode: 0
+  m_UpdateMode: 0
+  m_ApplyRootMotion: 0
+  m_LinearVelocityBlending: 0
+  m_StabilizeFeet: 0
+  m_AnimatePhysics: 0
+  m_WarningMessage: 
+  m_HasTransformHierarchy: 1
+  m_AllowConstantClipSamplingOptimization: 1
+  m_KeepAnimatorStateOnDisable: 0
+  m_WriteDefaultValuesOnDisable: 0
 --- !u!1 &3539774929142974534
 GameObject:
   m_ObjectHideFlags: 0

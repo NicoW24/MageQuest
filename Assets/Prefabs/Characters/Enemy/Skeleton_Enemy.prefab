@@ -53,6 +53,7 @@ MonoBehaviour:
   _currentDef: 0
   _currentAttack: 0
   _currentMana: 0
+  basicAttackChance: 0.7
   _listOwnedSkill: []
   isDead: 0
 --- !u!114 &6877402621105935825
@@ -246,6 +247,10 @@ PrefabInstance:
     - target: {fileID: 6451036946996704392, guid: 64359be8b124840d0bb4846426882691, type: 3}
       propertyPath: m_SortingLayer
       value: 2
+      objectReference: {fileID: 0}
+    - target: {fileID: 6451036946996704392, guid: 64359be8b124840d0bb4846426882691, type: 3}
+      propertyPath: m_SortingOrder
+      value: 1
       objectReference: {fileID: 0}
     - target: {fileID: 6451036946996704392, guid: 64359be8b124840d0bb4846426882691, type: 3}
       propertyPath: m_SortingLayerID

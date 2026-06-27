@@ -89,6 +89,11 @@ namespace Core.Game
                 return;
             }
 
+            if(statusEffect.effect == StatusEffect.Stun|| statusEffect.effect == StatusEffect.DOT)
+            {
+                BattleGUIManager.Instance.ActivateEffectIndicator(statusEffect.effect, this, true);
+            }
+
             _currentActiveStatusEffectWithDuration.Add(statusEffect, turnDuration);
         }
         /// <summary>
@@ -112,6 +117,13 @@ namespace Core.Game
             }
             foreach (CharacterSkillSO statusEffect in listExpiredStatusEffect)
             {
+                if (statusEffect.effect == StatusEffect.Stun)
+                {
+                    if (statusEffect.effect == StatusEffect.Stun || statusEffect.effect == StatusEffect.DOT)
+                    {
+                        BattleGUIManager.Instance.ActivateEffectIndicator(statusEffect.effect, this, false);
+                    }
+                }
                 _currentActiveStatusEffectWithDuration.Remove(statusEffect);
             }
         }

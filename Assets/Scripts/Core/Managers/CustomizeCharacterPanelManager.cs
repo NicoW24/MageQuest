@@ -30,6 +30,14 @@ namespace Core.Game
             BattleManager.Instance.GetPlayerStat().GetController().ResumeCharacter();
         }
 
+        public void OnCloseCustomizePanel()
+        {
+            ResumeCharacter();
+
+            //after costumize play intro cutscene
+            TimelineManager.Instance.PlayIntroTimeline();
+        }
+
         /// <summary>
         /// Change hair player character
         /// </summary>

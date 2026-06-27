@@ -37,6 +37,9 @@ namespace Core.Game
         [SerializeField] List<CharacterSkillSO> _listAllCharacterSkill = new List<CharacterSkillSO>();
         public IReadOnlyList<CharacterSkillSO> ListAllCharacterSkill => _listAllCharacterSkill;
 
+        [Header("For Dialog")]
+        [SerializeField] CharacterStat _bossEnemy;
+
         [SerializeField] CharacterStat _playerCharacter;
         CharacterController _playerCharController;
         [SerializeField] CharacterStat _currentEnemy;
@@ -110,9 +113,9 @@ namespace Core.Game
         /// <summary>
         /// Function to get battle state
         /// </summary>
-        public string GetTurnString()
+        public BattleState GetTurnString()
         {
-            return _currentBattleState.ToString();
+            return _currentBattleState;
         }
         /// <summary>
         /// Check if battle ended to stop coroutine
@@ -131,6 +134,14 @@ namespace Core.Game
         {
             _currentBattleState = state;
             BattleGUIManager.Instance.UpdateTurnUI();
+        }
+        /// <summary>
+        /// Boss battle after dialog end
+        /// </summary>
+        public void StartBossBattle()
+        {
+            //boss always has 1st turn
+            StartBattle(_bossEnemy,true);
         }
         /// <summary>
         /// Function start battle
@@ -218,13 +229,22 @@ namespace Core.Game
             }
             else
             {
-                //execute event, currently the event is resuming player control and alive enemy AI patrol and chase
-                OnBattleEnded?.Invoke();
+                //if not boss let player get scroll loot
+                if(_currentEnemy != _bossEnemy)
+                {
+                    //execute event, currently the event is resuming player control and alive enemy AI patrol and chase
+                    OnBattleEnded?.Invoke();
 
-                //disable enemy body
-                _currentEnemy.gameObject.SetActive(false);
-                //move chest to enemy body
-                _lootChestObject.SetupChest(_currentEnemy.transform.position);
+                    //disable enemy body
+                    _currentEnemy.gameObject.SetActive(false);
+                    //move chest to enemy body
+                    _lootChestObject.SetupChest(_currentEnemy.transform.position);
+                }
+                else
+                {
+                    PanelManager.Instance.OpenPanel("GameOverSplashscreen");
+                    PanelManager.Instance.GetPanel("GameOverSplashscreen").GetComponent<GameOverPanel>().SetupEndGameScreen();
+                }
             }
         }
         #endregion
@@ -418,6 +438,9 @@ namespace Core.Game
             {
                 #region Attack
                 yield return StartCoroutine(CharacterAttackSequence(_playerCharacter, _currentEnemy));
+                //stop coroutine if enemy died
+                if (IsBattleEnded())
+                    yield break;
                 #endregion
             }
             else
@@ -604,13 +627,15 @@ namespace Core.Game
 
             if (!_currentCharacterStunned)
             {
+                CharacterSkillSO skill = null;
+
                 //randomize enemy action
                 EnemyAction chosenAction = EnemyAction.Attack;
-                //randomize enemy skill
-                CharacterSkillSO skill = _currentEnemy.listOwnedSkill[Random.Range(0, _currentEnemy.listOwnedSkill.Count)];
                 //only randomize action if enemy has skill
                 if (_currentEnemy.listOwnedSkill.Count > 0)
                 {
+                    //randomize enemy skill
+                    skill = _currentEnemy.listOwnedSkill[Random.Range(0, _currentEnemy.listOwnedSkill.Count)];
                     //use weight action
                     float randomValue = Random.value;
                     if (randomValue < 0.70f)

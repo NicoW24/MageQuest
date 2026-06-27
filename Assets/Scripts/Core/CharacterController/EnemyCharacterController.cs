@@ -12,6 +12,7 @@ namespace Core.Game
         float _waitTimer;
 
         [Header("Detection")]
+        [SerializeField] bool _isBoss = false; //boss doesnt need to do patroll and chase 
         [SerializeField] Transform _player;
         [SerializeField] float _detectionRadius = 5f;
 
@@ -39,7 +40,7 @@ namespace Core.Game
 
         void Update()
         {
-            if (!_canMove || !_isAlive)
+            if (!_canMove || !_isAlive || _isBoss)
             {
                 return;
             }

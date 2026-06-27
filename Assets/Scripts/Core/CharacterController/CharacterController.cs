@@ -24,7 +24,7 @@ namespace Core.Game
         protected ParticleSystem _currentUsedParticle;
         protected Dictionary<string, ParticleSystem> _spawnedParticles = new Dictionary<string, ParticleSystem>();
 
-        public Dictionary<PlayerState, int> IndexPair = new();
+        bool _isInBattle = false;
 
         public virtual void Start()
         {
@@ -46,6 +46,10 @@ namespace Core.Game
             _initialCharPos = _characterSPUM.transform.position;
             _canMove = true;
             AddBattleEvent();
+
+            //add game manager event
+            GameManager.Instance.OnPauseAllCharacter += PauseCharacter;
+            GameManager.Instance.OnResumeAllCharacter += ResumeCharacter;
         }
 
         void AddBattleEvent()
@@ -67,6 +71,13 @@ namespace Core.Game
             BattleManager.Instance.OnBattleEnded -= BattleEnded;
             //reset pos and animation
             BattleManager.Instance.OnPlayAgain -= RestartCharacter;
+        }
+
+        void OnDestroy()
+        {
+            //remove game manager event
+            GameManager.Instance.OnPauseAllCharacter -= PauseCharacter;
+            GameManager.Instance.OnResumeAllCharacter -= ResumeCharacter;
         }
 
         /// <summary>
@@ -202,6 +213,7 @@ namespace Core.Game
             //reenable collider and rigidbody
             GetComponent<BoxCollider2D>().enabled = true;
             GetComponent<Rigidbody2D>().bodyType = RigidbodyType2D.Dynamic;
+            _isInBattle = false;
         }
         /// <summary>
         /// Check if character is alive
@@ -230,13 +242,22 @@ namespace Core.Game
             }
 
             _startBattlePos = transform.position;
+            _isInBattle = true;
         }
         /// <summary>
         /// Function when event battle ended is invoked
         /// </summary>
         public void BattleEnded()
         {
+            _isInBattle = false;
             ResumeCharacter();
+        }
+        /// <summary>
+        /// Function to check character is in battle or not
+        /// </summary>
+        public bool IsInBattle()
+        {
+            return _isInBattle;
         }
         /// <summary>
         /// Stop character movement and set to idle
@@ -275,10 +296,8 @@ namespace Core.Game
                 _currentUsedParticle = Instantiate(ps, effectContainer);
                 _spawnedParticles.Add(ps.name, _currentUsedParticle);
             }
-            _currentUsedParticle.gameObject.SetActive(true);
             //reset particle scale
             _currentUsedParticle.transform.localScale = Vector3.one;
-            _currentUsedParticle.Clear();
 
             //flip particle system if enemy char
             if(this != BattleManager.Instance.GetPlayerStat().GetController())
@@ -289,8 +308,10 @@ namespace Core.Game
             //if not shoot spawn at target
             if (!shoot)
             {
-                _currentUsedParticle.transform.position = target.transform.position + Vector3.up;
+                 _currentUsedParticle.transform.position = target.transform.position + Vector3.up;
             }
+            _currentUsedParticle.gameObject.SetActive(true);
+            _currentUsedParticle.Clear();
             _currentUsedParticle.Emit(1);
             StartCoroutine(DisableParticleAfterPlay());
         }

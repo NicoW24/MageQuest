@@ -17,5 +17,5 @@ MonoBehaviour:
   characterType: 0
   HP: 200
   Def: 10
-  Attack: 20
+  Attack: 15
   Mana: 50

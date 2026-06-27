@@ -13,7 +13,20 @@ namespace Core.Game
         [SerializeField] Slider _PlayerManaBar;
         [SerializeField] Slider _EnemyHPBar;
         [SerializeField] TextMeshProUGUI _turnText;
+
+        [SerializeField] Image _stunIndicatorEnemy;
+        [SerializeField] Image _stunIndicatorPlayer;
+
+        [SerializeField] GameObject _burnIndicatorEnemy;
+        [SerializeField] GameObject _burnIndicatorPlayer;
+
         CharacterStat _player, _enemy;
+
+        [Header("Header Color")]
+        [SerializeField] Image _headerBG;
+        [SerializeField] Color _playerTurnColor;
+        [SerializeField] Color _EnemyTurnColor;
+        [SerializeField] Color _WinTurnColor;
 
         public static BattleGUIManager Instance;
 
@@ -32,6 +45,9 @@ namespace Core.Game
             _player = player;
             _enemy = enemy;
 
+            //reset stun indicator
+            DisableAllEffectIndicator();
+
             _PlayerHPBar.maxValue = _player.GetMaxHP();
             _EnemyHPBar.maxValue = _enemy.GetMaxHP();
             _PlayerManaBar.maxValue = _player.GetMaxMana();
@@ -48,12 +64,69 @@ namespace Core.Game
             //close skill
             PlayerSkillActionPanelManager.Instance.ClosePanel();
         }
+        public void ActivateEffectIndicator(StatusEffect statusEffect, CharacterStat character, bool active)
+        {
+            switch (statusEffect)
+            {
+                case StatusEffect.Stun:
+                    if (character == _player)
+                    {
+                        _stunIndicatorPlayer.gameObject.SetActive(active);
+                    }
+                    if (character == _enemy)
+                    {
+                        _stunIndicatorEnemy.gameObject.SetActive(active);
+                    }
+                    break;
+                case StatusEffect.DOT:
+                    if (character == _player)
+                    {
+                        _burnIndicatorPlayer.gameObject.SetActive(active);
+                    }
+                    if (character == _enemy)
+                    {
+                        _burnIndicatorEnemy.gameObject.SetActive(active);
+                    }
+                    break;
+            }
+        }
+
+        public void DisableAllEffectIndicator()
+        {
+            _stunIndicatorEnemy.gameObject.SetActive(false);
+            _stunIndicatorPlayer.gameObject.SetActive(false);
+            _burnIndicatorEnemy.gameObject.SetActive(false);
+            _burnIndicatorPlayer.gameObject.SetActive(false);
+        }
+
         /// <summary>
         /// Update turn text
         /// </summary>
         public void UpdateTurnUI()
         {
-            _turnText.text = BattleManager.Instance.GetTurnString();
+            switch (BattleManager.Instance.GetTurnString())
+            {
+                case BattleState.NoBattle:
+                    _turnText.text = "No Battle";
+                    _headerBG.color = Color.black;
+                    break;
+                case BattleState.PlayerTurn:
+                    _turnText.text = "Player Turn";
+                    _headerBG.color = _playerTurnColor;
+                    break;
+                case BattleState.EnemyTurn:
+                    _turnText.text = "Enemy Turn";
+                    _headerBG.color = _EnemyTurnColor;
+                    break;
+                case BattleState.Win:
+                    _turnText.text = "Player Win";
+                    _headerBG.color = _WinTurnColor;
+                    break;
+                case BattleState.Lose:
+                    _turnText.text = "Player Lose";
+                    _headerBG.color = Color.black;
+                    break;
+            }
         }
         /// <summary>
         /// Update HP slider according to current data
@@ -112,6 +185,8 @@ namespace Core.Game
         public void PlayerAttack()
         {
             BattleManager.Instance.OnPlayerAction(PlayerAction.Attack);
+            //close skill if open
+            PlayerSkillActionPanelManager.Instance.ClosePanel();
         }
         /// <summary>
         /// On click defend button
@@ -119,15 +194,17 @@ namespace Core.Game
         public void PlayerDefend()
         {
             BattleManager.Instance.OnPlayerAction(PlayerAction.Defend);
+            //close skill if open
+            PlayerSkillActionPanelManager.Instance.ClosePanel();
         }
         /// <summary>
         /// On click skill button
         /// </summary>
         public void PlayerSkill()
         {
-            if (BattleManager.Instance.GetTurnString().Contains("Player"))
+            if (BattleManager.Instance.GetTurnString().ToString().Contains("Player"))
             {
-                PlayerSkillActionPanelManager.Instance.OpenPanel();
+                PlayerSkillActionPanelManager.Instance.TogglePanel();
             }
         }
         #endregion

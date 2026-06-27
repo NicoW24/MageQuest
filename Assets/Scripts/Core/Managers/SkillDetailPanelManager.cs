@@ -25,7 +25,7 @@ namespace Core.Game
         /// <summary>
         /// Set skill data to UI
         /// </summary>
-        public void SetData(CharacterSkillSO skill,LootChestObject chest)
+        public void SetData(CharacterSkillSO skill,LootChestObject chest = null)
         {
             _skillNameText.text = skill.skillName;
             _skillDescText.text = skill.skillDesc;
@@ -39,7 +39,8 @@ namespace Core.Game
         /// </summary>
         public void CloseChest()
         {
-            _currentChest.CloseChest();
+            if(_currentChest != null)
+                _currentChest.CloseChest();
         }
     }
 }

@@ -34,7 +34,7 @@ namespace Core.Game
                 return;
             }
 
-            if (Input.GetKeyDown(KeyCode.Mouse0))
+            if (Input.GetKeyDown(KeyCode.Mouse0) && _currentInteractableObject == null)
             {
                 Attack();
             }
@@ -157,7 +157,7 @@ namespace Core.Game
                     _currentInteractableObject.GetChestObject().OpenChest();
                     break;
                 case InteractObjectType.Npc:
-                    //open dialog (NOT DONE)
+                    _currentInteractableObject.GetDialogObject().StartDialog();
                     break;
             }
         }

@@ -22,7 +22,7 @@ namespace Core.Game
 
         public void SetupSkillActionButton(CharacterSkillSO skill)
         {
-            _skillNameText.text = $"{skill.skillName}\n<Size=8>Dmg {skill.damage}/Cost {skill.manaCost}";
+            _skillNameText.text = $"{skill.skillName}\n<Size=15>Dmg {skill.damage}/Cost {skill.manaCost}";
             _skill = skill;
         }
 

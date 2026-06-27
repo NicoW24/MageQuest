@@ -916,4 +916,12 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: df345d942e648f94c84e80f6140ab8c4, type: 3}
   m_Name: 
   m_EditorClassIdentifier: UI.Game::GameOverPanel
+  OnOpen:
+    m_PersistentCalls:
+      m_Calls: []
+  OnClose:
+    m_PersistentCalls:
+      m_Calls: []
   _animator: {fileID: 0}
+  _text: {fileID: 4527965317906094267}
+  _playAgainButton: {fileID: 5491253891941394528}

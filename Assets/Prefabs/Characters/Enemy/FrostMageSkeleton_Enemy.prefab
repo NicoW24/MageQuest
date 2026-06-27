@@ -54,7 +54,7 @@ MonoBehaviour:
   _currentDef: 0
   _currentAttack: 0
   _currentMana: 0
-  basicAttackChance: 0.7
+  basicAttackChance: 0.6
   _listOwnedSkill:
   - {fileID: 11400000, guid: 571df3a03a820654aaf8669d61ebf1ad, type: 2}
   - {fileID: 11400000, guid: 91a511dc46acd6847a384a771c802abb, type: 2}
@@ -75,6 +75,7 @@ MonoBehaviour:
   effectContainer: {fileID: 6833473275316482004}
   patrolDistance: 3
   patrolWaitTime: 1.5
+  _isBoss: 0
   _player: {fileID: 0}
   _detectionRadius: 5
   _stoppingDistance: 1.65
@@ -245,6 +246,10 @@ PrefabInstance:
     - target: {fileID: 4456812989396493189, guid: cdf58f088f9ff419b85fa0917cdf4bf8, type: 3}
       propertyPath: m_SortingLayer
       value: 2
+      objectReference: {fileID: 0}
+    - target: {fileID: 4456812989396493189, guid: cdf58f088f9ff419b85fa0917cdf4bf8, type: 3}
+      propertyPath: m_SortingOrder
+      value: 1
       objectReference: {fileID: 0}
     - target: {fileID: 4456812989396493189, guid: cdf58f088f9ff419b85fa0917cdf4bf8, type: 3}
       propertyPath: m_SortingLayerID
